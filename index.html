@@ -64,6 +64,7 @@
     font-size: 14px;
     color: #2563eb;
     cursor: pointer;
+    text-decoration: none;
   }
 </style>
 </head>
@@ -85,7 +86,11 @@
     <h2>Scan Absensi</h2>
     <div class="info-petugas">Petugas: <span id="namaPetugas"></span></div>
 
-    <select id="sesiSelect">
+    <select id="pelatihanSelect" onchange="onPelatihanChange()">
+      <option value="">-- Pilih Pelatihan --</option>
+    </select>
+
+    <select id="sesiSelect" disabled>
       <option value="">-- Pilih Sesi --</option>
     </select>
 
@@ -96,7 +101,7 @@
 
     <div id="resultBox" class="result-box hidden"></div>
 
-    <a href="dashboard.html" class="small-link" style="display:block; text-decoration:none;">📊 Lihat Dashboard</a>
+    <a href="dashboard.html" class="small-link">📊 Lihat Dashboard</a>
     <span class="small-link" onclick="logout()">Logout</span>
   </div>
 
@@ -104,12 +109,13 @@
 
 <script>
 // =================== GANTI URL INI ===================
-const API_URL = 'https://script.google.com/macros/s/AKfycbyO6acFGHzzJC8kdFWvR7kMytbLRn8TNsZI0BlJIPRaMmeRBmsqPOXohXHnEzuaeYT6tw/exec';
+const API_URL = 'URL_APPS_SCRIPT_KAMU';
 // =======================================================
 
 let petugasNama = '';
 let html5QrCode = null;
 let isProcessing = false;
+let sesiByPelatihan = {};
 
 // ---------- LOGIN ----------
 async function login() {
@@ -156,7 +162,7 @@ function logout() {
   document.getElementById('loginSection').classList.remove('hidden');
 }
 
-// ---------- LOAD SESI ----------
+// ---------- LOAD SESI (per pelatihan) ----------
 async function loadSesi() {
   try {
     const res = await fetch(API_URL, {
@@ -164,13 +170,14 @@ async function loadSesi() {
       body: JSON.stringify({ action: 'getSesi' })
     });
     const data = await res.json();
-    const select = document.getElementById('sesiSelect');
-    select.innerHTML = '<option value="">-- Pilih Sesi --</option>';
     if (data.success) {
-      data.sesi.forEach(s => {
+      sesiByPelatihan = data.sesiByPelatihan;
+      const select = document.getElementById('pelatihanSelect');
+      select.innerHTML = '<option value="">-- Pilih Pelatihan --</option>';
+      Object.keys(sesiByPelatihan).forEach(p => {
         const opt = document.createElement('option');
-        opt.value = s;
-        opt.textContent = s;
+        opt.value = p;
+        opt.textContent = p;
         select.appendChild(opt);
       });
     }
@@ -179,11 +186,30 @@ async function loadSesi() {
   }
 }
 
+function onPelatihanChange() {
+  const pelatihan = document.getElementById('pelatihanSelect').value;
+  const sesiSelect = document.getElementById('sesiSelect');
+  sesiSelect.innerHTML = '<option value="">-- Pilih Sesi --</option>';
+
+  if (pelatihan && sesiByPelatihan[pelatihan]) {
+    sesiSelect.disabled = false;
+    sesiByPelatihan[pelatihan].forEach(s => {
+      const opt = document.createElement('option');
+      opt.value = s;
+      opt.textContent = s;
+      sesiSelect.appendChild(opt);
+    });
+  } else {
+    sesiSelect.disabled = true;
+  }
+}
+
 // ---------- SCANNER ----------
 function startScanner() {
+  const pelatihan = document.getElementById('pelatihanSelect').value;
   const sesi = document.getElementById('sesiSelect').value;
-  if (!sesi) {
-    alert('Pilih sesi terlebih dahulu');
+  if (!pelatihan || !sesi) {
+    alert('Pilih Pelatihan dan Sesi terlebih dahulu');
     return;
   }
 
@@ -216,6 +242,7 @@ async function onScanSuccess(decodedText) {
   if (isProcessing) return;
   isProcessing = true;
 
+  const pelatihan = document.getElementById('pelatihanSelect').value;
   const sesi = document.getElementById('sesiSelect').value;
   const resultBox = document.getElementById('resultBox');
   resultBox.classList.remove('hidden', 'success', 'error');
@@ -228,6 +255,7 @@ async function onScanSuccess(decodedText) {
         action: 'absen',
         id: decodedText,
         sesi: sesi,
+        pelatihan: pelatihan,
         petugas: petugasNama
       })
     });
@@ -246,7 +274,6 @@ async function onScanSuccess(decodedText) {
     resultBox.textContent = 'Gagal terhubung ke server';
   }
 
-  // jeda sebelum bisa scan lagi, supaya tidak dobel-dobel scan ID yang sama
   setTimeout(() => { isProcessing = false; }, 2500);
 }
 
