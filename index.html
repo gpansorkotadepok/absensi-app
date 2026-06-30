@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Absensi Peserta</title>
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: Arial, sans-serif;
+    background: #f0f2f5;
+    margin: 0;
+    padding: 16px;
+    display: flex;
+    justify-content: center;
+  }
+  .container {
+    background: #fff;
+    width: 100%;
+    max-width: 420px;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+  h2 { text-align: center; margin-top: 0; }
+  input, select, button {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+  }
+  button {
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  button:disabled { background: #aaa; }
+  #reader { width: 100%; margin-top: 10px; border-radius: 8px; overflow: hidden; }
+  .hidden { display: none; }
+  .result-box {
+    margin-top: 16px;
+    padding: 14px;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: bold;
+  }
+  .success { background: #d1fae5; color: #065f46; }
+  .error { background: #fee2e2; color: #991b1b; }
+  .info-petugas {
+    text-align: center;
+    color: #555;
+    font-size: 14px;
+    margin-bottom: 10px;
+  }
+  .small-link {
+    text-align: center;
+    display: block;
+    margin-top: 10px;
+    font-size: 14px;
+    color: #2563eb;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- LOGIN -->
+  <div id="loginSection">
+    <h2>Login Petugas</h2>
+    <input type="text" id="loginUser" placeholder="Username">
+    <input type="password" id="loginPass" placeholder="Password">
+    <button onclick="login()">Masuk</button>
+    <div id="loginError" class="result-box error hidden"></div>
+  </div>
+
+  <!-- ABSEN -->
+  <div id="absenSection" class="hidden">
+    <h2>Scan Absensi</h2>
+    <div class="info-petugas">Petugas: <span id="namaPetugas"></span></div>
+
+    <select id="sesiSelect">
+      <option value="">-- Pilih Sesi --</option>
+    </select>
+
+    <button id="startBtn" onclick="startScanner()">Mulai Scan</button>
+    <button id="stopBtn" onclick="stopScanner()" class="hidden">Hentikan Scan</button>
+
+    <div id="reader"></div>
+
+    <div id="resultBox" class="result-box hidden"></div>
+
+    <span class="small-link" onclick="logout()">Logout</span>
+  </div>
+
+</div>
+
+<script>
+// =================== GANTI URL INI ===================
+const API_URL = 'https://script.google.com/macros/s/AKfycbyO6acFGHzzJC8kdFWvR7kMytbLRn8TNsZI0BlJIPRaMmeRBmsqPOXohXHnEzuaeYT6tw/exec';
+// =======================================================
+
+let petugasNama = '';
+let html5QrCode = null;
+let isProcessing = false;
+
+// ---------- LOGIN ----------
+async function login() {
+  const user = document.getElementById('loginUser').value.trim();
+  const pass = document.getElementById('loginPass').value.trim();
+  const errBox = document.getElementById('loginError');
+  errBox.classList.add('hidden');
+
+  if (!user || !pass) {
+    errBox.textContent = 'Username dan password wajib diisi';
+    errBox.classList.remove('hidden');
+    return;
+  }
+
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'login', user, password: pass })
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      petugasNama = data.nama;
+      document.getElementById('namaPetugas').textContent = petugasNama;
+      document.getElementById('loginSection').classList.add('hidden');
+      document.getElementById('absenSection').classList.remove('hidden');
+      loadSesi();
+    } else {
+      errBox.textContent = data.message || 'Login gagal';
+      errBox.classList.remove('hidden');
+    }
+  } catch (e) {
+    errBox.textContent = 'Gagal terhubung ke server';
+    errBox.classList.remove('hidden');
+  }
+}
+
+function logout() {
+  stopScanner();
+  petugasNama = '';
+  document.getElementById('loginUser').value = '';
+  document.getElementById('loginPass').value = '';
+  document.getElementById('absenSection').classList.add('hidden');
+  document.getElementById('loginSection').classList.remove('hidden');
+}
+
+// ---------- LOAD SESI ----------
+async function loadSesi() {
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'getSesi' })
+    });
+    const data = await res.json();
+    const select = document.getElementById('sesiSelect');
+    select.innerHTML = '<option value="">-- Pilih Sesi --</option>';
+    if (data.success) {
+      data.sesi.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s;
+        opt.textContent = s;
+        select.appendChild(opt);
+      });
+    }
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+// ---------- SCANNER ----------
+function startScanner() {
+  const sesi = document.getElementById('sesiSelect').value;
+  if (!sesi) {
+    alert('Pilih sesi terlebih dahulu');
+    return;
+  }
+
+  document.getElementById('startBtn').classList.add('hidden');
+  document.getElementById('stopBtn').classList.remove('hidden');
+
+  html5QrCode = new Html5Qrcode('reader');
+  html5QrCode.start(
+    { facingMode: 'environment' },
+    { fps: 10, qrbox: 250 },
+    onScanSuccess
+  ).catch(err => {
+    alert('Tidak bisa mengakses kamera: ' + err);
+    stopScanner();
+  });
+}
+
+function stopScanner() {
+  if (html5QrCode) {
+    html5QrCode.stop().then(() => {
+      html5QrCode.clear();
+      html5QrCode = null;
+    }).catch(() => {});
+  }
+  document.getElementById('startBtn').classList.remove('hidden');
+  document.getElementById('stopBtn').classList.add('hidden');
+}
+
+async function onScanSuccess(decodedText) {
+  if (isProcessing) return;
+  isProcessing = true;
+
+  const sesi = document.getElementById('sesiSelect').value;
+  const resultBox = document.getElementById('resultBox');
+  resultBox.classList.remove('hidden', 'success', 'error');
+  resultBox.textContent = 'Memproses...';
+
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      body: JSON.stringify({
+        action: 'absen',
+        id: decodedText,
+        sesi: sesi,
+        petugas: petugasNama
+      })
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      resultBox.classList.add('success');
+      resultBox.textContent = '✔ ' + data.nama + ' - Absen Berhasil';
+      beep();
+    } else {
+      resultBox.classList.add('error');
+      resultBox.textContent = '✘ ' + (data.message || 'Gagal absen');
+    }
+  } catch (e) {
+    resultBox.classList.add('error');
+    resultBox.textContent = 'Gagal terhubung ke server';
+  }
+
+  // jeda sebelum bisa scan lagi, supaya tidak dobel-dobel scan ID yang sama
+  setTimeout(() => { isProcessing = false; }, 2500);
+}
+
+function beep() {
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  const osc = ctx.createOscillator();
+  osc.connect(ctx.destination);
+  osc.start();
+  osc.stop(ctx.currentTime + 0.15);
+}
+</script>
+
+</body>
+</html>
