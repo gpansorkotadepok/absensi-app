@@ -104,9 +104,6 @@
   .table-section h3 {
     margin: 0 0 14px;
     font-size: 15px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
   }
   .tabs {
     display: flex;
@@ -152,6 +149,7 @@
     color: #9ca3af;
     padding: 30px 0;
   }
+  .hidden { display: none; }
   .loading {
     text-align: center;
     padding: 40px;
@@ -177,7 +175,7 @@
 <div class="wrapper">
 
   <div class="filters">
-    <select id="filterPelatihan" onchange="render()">
+    <select id="filterPelatihan" onchange="onFilterPelatihanChange()">
       <option value="">Semua Pelatihan</option>
     </select>
     <select id="filterSesi" onchange="render()">
@@ -187,7 +185,7 @@
 
   <div id="loadingMsg" class="loading">Memuat data...</div>
 
-  <div id="content" class="hidden" style="display:none;">
+  <div id="content" class="hidden">
 
     <div class="cards">
       <div class="card total">
@@ -243,7 +241,7 @@
 
 <script>
 // =================== GANTI URL INI ===================
-const API_URL = 'https://script.google.com/macros/s/AKfycbyO6acFGHzzJC8kdFWvR7kMytbLRn8TNsZI0BlJIPRaMmeRBmsqPOXohXHnEzuaeYT6tw/exec';
+const API_URL = 'URL_APPS_SCRIPT_KAMU';
 // =======================================================
 
 let dashboardData = null;
@@ -265,8 +263,8 @@ async function loadDashboard() {
     dashboardData = data;
     populateFilters(data);
 
-    document.getElementById('loadingMsg').style.display = 'none';
-    document.getElementById('content').style.display = 'block';
+    document.getElementById('loadingMsg').classList.add('hidden');
+    document.getElementById('content').classList.remove('hidden');
     render();
   } catch (e) {
     document.getElementById('loadingMsg').textContent = 'Gagal terhubung ke server';
@@ -280,13 +278,35 @@ function populateFilters(data) {
     opt.value = p; opt.textContent = p;
     selPelatihan.appendChild(opt);
   });
+  updateSesiFilter('');
+}
 
+function updateSesiFilter(pelatihan) {
   const selSesi = document.getElementById('filterSesi');
-  data.sesiList.forEach(s => {
+  selSesi.innerHTML = '<option value="">Semua Sesi</option>';
+
+  let list = [];
+  if (pelatihan && dashboardData.sesiByPelatihan[pelatihan]) {
+    list = dashboardData.sesiByPelatihan[pelatihan];
+  } else {
+    const set = {};
+    Object.values(dashboardData.sesiByPelatihan).forEach(arr => {
+      arr.forEach(s => set[s] = true);
+    });
+    list = Object.keys(set);
+  }
+
+  list.forEach(s => {
     const opt = document.createElement('option');
     opt.value = s; opt.textContent = s;
     selSesi.appendChild(opt);
   });
+}
+
+function onFilterPelatihanChange() {
+  const pelatihan = document.getElementById('filterPelatihan').value;
+  updateSesiFilter(pelatihan);
+  render();
 }
 
 function setTab(tab) {
@@ -310,9 +330,16 @@ function render() {
     peserta = peserta.filter(p => p.pelatihan === pelatihanFilter);
   }
 
-  // status kehadiran tergantung sesi yg dipilih
-  // kalau "semua sesi" dipilih, dianggap "hadir" jika sudah absen di SALAH SATU sesi
-  const sesiToCheck = sesiFilter ? [sesiFilter] : dashboardData.sesiList;
+  let sesiToCheck;
+  if (sesiFilter) {
+    sesiToCheck = [sesiFilter];
+  } else if (pelatihanFilter && dashboardData.sesiByPelatihan[pelatihanFilter]) {
+    sesiToCheck = dashboardData.sesiByPelatihan[pelatihanFilter];
+  } else {
+    const set = {};
+    Object.values(dashboardData.sesiByPelatihan).forEach(arr => arr.forEach(s => set[s] = true));
+    sesiToCheck = Object.keys(set);
+  }
 
   const withStatus = peserta.map(p => {
     let hadir = false;
@@ -336,7 +363,6 @@ function render() {
   fill.style.width = persen + '%';
   fill.textContent = persen + '%';
 
-  // filter berdasar tab + pencarian
   let filtered = withStatus;
   if (currentTab === 'hadir') filtered = filtered.filter(p => p.hadir);
   if (currentTab === 'belum') filtered = filtered.filter(p => !p.hadir);
