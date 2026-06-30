@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Absensi</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #f4f6f9;
+    margin: 0;
+    padding: 16px;
+    color: #1f2937;
+  }
+  .topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1100px;
+    margin: 0 auto 20px;
+  }
+  .topbar h1 { font-size: 20px; margin: 0; }
+  .topbar a {
+    text-decoration: none;
+    color: #2563eb;
+    font-weight: bold;
+    font-size: 14px;
+  }
+  .wrapper { max-width: 1100px; margin: 0 auto; }
+
+  .filters {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+  .filters select {
+    flex: 1;
+    min-width: 160px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    background: #fff;
+    font-size: 14px;
+  }
+
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+  .card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 18px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  }
+  .card .label { font-size: 13px; color: #6b7280; margin-bottom: 6px; }
+  .card .value { font-size: 28px; font-weight: 700; }
+  .card.total .value { color: #2563eb; }
+  .card.hadir .value { color: #059669; }
+  .card.belum .value { color: #dc2626; }
+  .card.persen .value { color: #7c3aed; }
+
+  .progress-section {
+    background: #fff;
+    border-radius: 14px;
+    padding: 18px;
+    margin-bottom: 24px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  }
+  .progress-section h3 { margin: 0 0 14px; font-size: 15px; }
+  .progress-bar-bg {
+    width: 100%;
+    height: 22px;
+    background: #e5e7eb;
+    border-radius: 11px;
+    overflow: hidden;
+    position: relative;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #34d399, #059669);
+    border-radius: 11px;
+    transition: width 0.4s ease;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    color: #fff;
+    font-size: 12px;
+    font-weight: bold;
+    padding-right: 8px;
+    white-space: nowrap;
+  }
+
+  .table-section {
+    background: #fff;
+    border-radius: 14px;
+    padding: 18px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  }
+  .table-section h3 {
+    margin: 0 0 14px;
+    font-size: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .tab-btn {
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: 1px solid #d1d5db;
+    background: #fff;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .tab-btn.active {
+    background: #2563eb;
+    color: #fff;
+    border-color: #2563eb;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  th, td {
+    text-align: left;
+    padding: 10px 8px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  th { color: #6b7280; font-size: 12px; text-transform: uppercase; }
+  .badge {
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .badge.hadir { background: #d1fae5; color: #065f46; }
+  .badge.belum { background: #fee2e2; color: #991b1b; }
+
+  .empty-msg {
+    text-align: center;
+    color: #9ca3af;
+    padding: 30px 0;
+  }
+  .loading {
+    text-align: center;
+    padding: 40px;
+    color: #6b7280;
+  }
+  input#searchBox {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    margin-bottom: 12px;
+    font-size: 14px;
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>📊 Dashboard Absensi</h1>
+  <a href="index.html">← Kembali ke Scan</a>
+</div>
+
+<div class="wrapper">
+
+  <div class="filters">
+    <select id="filterPelatihan" onchange="render()">
+      <option value="">Semua Pelatihan</option>
+    </select>
+    <select id="filterSesi" onchange="render()">
+      <option value="">Semua Sesi</option>
+    </select>
+  </div>
+
+  <div id="loadingMsg" class="loading">Memuat data...</div>
+
+  <div id="content" class="hidden" style="display:none;">
+
+    <div class="cards">
+      <div class="card total">
+        <div class="label">Total Peserta</div>
+        <div class="value" id="cardTotal">0</div>
+      </div>
+      <div class="card hadir">
+        <div class="label">Sudah Absen</div>
+        <div class="value" id="cardHadir">0</div>
+      </div>
+      <div class="card belum">
+        <div class="label">Belum Absen</div>
+        <div class="value" id="cardBelum">0</div>
+      </div>
+      <div class="card persen">
+        <div class="label">Persentase</div>
+        <div class="value" id="cardPersen">0%</div>
+      </div>
+    </div>
+
+    <div class="progress-section">
+      <h3>Progress Kehadiran</h3>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progressFill" style="width:0%">0%</div>
+      </div>
+    </div>
+
+    <div class="table-section">
+      <h3>Daftar Peserta</h3>
+      <div class="tabs">
+        <button class="tab-btn active" id="tabSemua" onclick="setTab('semua')">Semua</button>
+        <button class="tab-btn" id="tabHadir" onclick="setTab('hadir')">Sudah Absen</button>
+        <button class="tab-btn" id="tabBelum" onclick="setTab('belum')">Belum Absen</button>
+      </div>
+      <input type="text" id="searchBox" placeholder="Cari nama atau ID..." oninput="render()">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nama</th>
+            <th>Pelatihan</th>
+            <th>Wilayah</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+      <div id="emptyMsg" class="empty-msg hidden">Tidak ada data</div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// =================== GANTI URL INI ===================
+const API_URL = 'https://script.google.com/macros/s/AKfycbyO6acFGHzzJC8kdFWvR7kMytbLRn8TNsZI0BlJIPRaMmeRBmsqPOXohXHnEzuaeYT6tw/exec';
+// =======================================================
+
+let dashboardData = null;
+let currentTab = 'semua';
+
+async function loadDashboard() {
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'getDashboard' })
+    });
+    const data = await res.json();
+
+    if (!data.success) {
+      document.getElementById('loadingMsg').textContent = 'Gagal memuat data';
+      return;
+    }
+
+    dashboardData = data;
+    populateFilters(data);
+
+    document.getElementById('loadingMsg').style.display = 'none';
+    document.getElementById('content').style.display = 'block';
+    render();
+  } catch (e) {
+    document.getElementById('loadingMsg').textContent = 'Gagal terhubung ke server';
+  }
+}
+
+function populateFilters(data) {
+  const selPelatihan = document.getElementById('filterPelatihan');
+  data.pelatihanList.forEach(p => {
+    const opt = document.createElement('option');
+    opt.value = p; opt.textContent = p;
+    selPelatihan.appendChild(opt);
+  });
+
+  const selSesi = document.getElementById('filterSesi');
+  data.sesiList.forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s; opt.textContent = s;
+    selSesi.appendChild(opt);
+  });
+}
+
+function setTab(tab) {
+  currentTab = tab;
+  ['semua','hadir','belum'].forEach(t => {
+    document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1))
+      .classList.toggle('active', t === tab);
+  });
+  render();
+}
+
+function render() {
+  if (!dashboardData) return;
+
+  const pelatihanFilter = document.getElementById('filterPelatihan').value;
+  const sesiFilter = document.getElementById('filterSesi').value;
+  const searchTerm = document.getElementById('searchBox').value.toLowerCase().trim();
+
+  let peserta = dashboardData.peserta;
+  if (pelatihanFilter) {
+    peserta = peserta.filter(p => p.pelatihan === pelatihanFilter);
+  }
+
+  // status kehadiran tergantung sesi yg dipilih
+  // kalau "semua sesi" dipilih, dianggap "hadir" jika sudah absen di SALAH SATU sesi
+  const sesiToCheck = sesiFilter ? [sesiFilter] : dashboardData.sesiList;
+
+  const withStatus = peserta.map(p => {
+    let hadir = false;
+    for (const s of sesiToCheck) {
+      if (dashboardData.absensiSet[p.id + '|' + s]) { hadir = true; break; }
+    }
+    return Object.assign({}, p, { hadir });
+  });
+
+  const totalCount = withStatus.length;
+  const hadirCount = withStatus.filter(p => p.hadir).length;
+  const belumCount = totalCount - hadirCount;
+  const persen = totalCount ? Math.round((hadirCount / totalCount) * 100) : 0;
+
+  document.getElementById('cardTotal').textContent = totalCount;
+  document.getElementById('cardHadir').textContent = hadirCount;
+  document.getElementById('cardBelum').textContent = belumCount;
+  document.getElementById('cardPersen').textContent = persen + '%';
+
+  const fill = document.getElementById('progressFill');
+  fill.style.width = persen + '%';
+  fill.textContent = persen + '%';
+
+  // filter berdasar tab + pencarian
+  let filtered = withStatus;
+  if (currentTab === 'hadir') filtered = filtered.filter(p => p.hadir);
+  if (currentTab === 'belum') filtered = filtered.filter(p => !p.hadir);
+
+  if (searchTerm) {
+    filtered = filtered.filter(p =>
+      p.nama.toLowerCase().includes(searchTerm) ||
+      p.id.toLowerCase().includes(searchTerm)
+    );
+  }
+
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = '';
+
+  if (filtered.length === 0) {
+    document.getElementById('emptyMsg').classList.remove('hidden');
+  } else {
+    document.getElementById('emptyMsg').classList.add('hidden');
+    filtered.forEach(p => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${p.id}</td>
+        <td>${p.nama}</td>
+        <td>${p.pelatihan}</td>
+        <td>${p.wilayah}</td>
+        <td>${p.hadir
+          ? '<span class="badge hadir">Sudah Absen</span>'
+          : '<span class="badge belum">Belum Absen</span>'}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+}
+
+loadDashboard();
+</script>
+
+</body>
+</html>
