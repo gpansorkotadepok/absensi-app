@@ -7,52 +7,39 @@
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-
   :root {
     --green:       #006633;
     --green-dark:  #004d26;
     --green-light: #e8f5ee;
     --gold:        #c8972a;
-    --gold-light:  #fff8e7;
-    --white:       #ffffff;
     --gray-100:    #f5f5f5;
     --gray-200:    #e8e8e8;
     --gray-400:    #9e9e9e;
     --gray-700:    #424242;
     --radius:      16px;
     --shadow:      0 8px 32px rgba(0,0,0,0.12);
-    --shadow-sm:   0 2px 8px rgba(0,0,0,0.08);
   }
-
   * { box-sizing: border-box; margin: 0; padding: 0; }
-
   body {
     font-family: 'Inter', sans-serif;
     background: linear-gradient(135deg, #004d26 0%, #006633 50%, #1a8c4e 100%);
     min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: flex; align-items: center; justify-content: center;
     padding: 16px;
   }
 
-  /* ===== LOADING OVERLAY ===== */
+  /* LOADING OVERLAY */
   #loadingOverlay {
-    position: fixed;
-    inset: 0;
+    position: fixed; inset: 0;
     background: rgba(0,0,0,0.45);
     backdrop-filter: blur(4px);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    z-index: 999;
-    gap: 16px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    z-index: 999; gap: 16px;
   }
   #loadingOverlay.hidden { display: none; }
   .spinner {
-    width: 52px;
-    height: 52px;
+    width: 52px; height: 52px;
     border: 4px solid rgba(255,255,255,0.2);
     border-top: 4px solid #fff;
     border-radius: 50%;
@@ -60,200 +47,148 @@
   }
   @keyframes spin { to { transform: rotate(360deg); } }
   .spinner-text { color: #fff; font-size: 14px; font-weight: 500; }
+  .hidden { display: none !important; }
 
-  /* ===== CARD ===== */
+  /* CARD */
   .card {
     background: rgba(255,255,255,0.97);
     backdrop-filter: blur(20px);
     border-radius: var(--radius);
     box-shadow: var(--shadow);
-    width: 100%;
-    max-width: 400px;
+    width: 100%; max-width: 420px;
     overflow: hidden;
   }
 
-  /* ===== LOGIN SECTION ===== */
+  /* LOGIN */
   .login-header {
     background: linear-gradient(135deg, var(--green-dark), var(--green));
-    padding: 32px 24px;
-    text-align: center;
+    padding: 32px 24px; text-align: center;
   }
   .login-logo {
-    width: 88px;
-    height: 88px;
-    border-radius: 50%;
+    width: 88px; height: 88px; border-radius: 50%;
     border: 3px solid rgba(255,255,255,0.4);
-    margin: 0 auto 12px;
-    overflow: hidden;
-    background: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    margin: 0 auto 12px; overflow: hidden;
+    background: #fff; display: flex;
+    align-items: center; justify-content: center;
   }
-  .login-logo img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-  }
-  .login-header h1 {
-    color: #fff;
-    font-size: 18px;
-    font-weight: 700;
-  }
-  .login-header p {
-    color: rgba(255,255,255,0.75);
-    font-size: 13px;
-    margin-top: 4px;
-  }
-
+  .login-logo img { width: 100%; height: 100%; object-fit: contain; }
+  .login-header h1 { color: #fff; font-size: 18px; font-weight: 700; }
+  .login-header p  { color: rgba(255,255,255,0.75); font-size: 13px; margin-top: 4px; }
   .login-body { padding: 28px 24px; }
 
-  .input-group {
-    margin-bottom: 14px;
-  }
-  .input-group label {
-    display: block;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--gray-700);
-    margin-bottom: 6px;
-  }
+  .input-group { margin-bottom: 14px; }
+  .input-group label { display: block; font-size: 13px; font-weight: 600; color: var(--gray-700); margin-bottom: 6px; }
   .input-group input {
-    width: 100%;
-    padding: 12px 14px;
-    border: 1.5px solid var(--gray-200);
-    border-radius: 10px;
-    font-size: 15px;
-    font-family: 'Inter', sans-serif;
-    color: var(--gray-700);
-    background: var(--gray-100);
-    transition: border 0.2s, box-shadow 0.2s;
-    outline: none;
+    width: 100%; padding: 12px 14px;
+    border: 1.5px solid var(--gray-200); border-radius: 10px;
+    font-size: 15px; font-family: 'Inter', sans-serif;
+    color: var(--gray-700); background: var(--gray-100);
+    transition: border 0.2s, box-shadow 0.2s; outline: none;
   }
   .input-group input:focus {
-    border-color: var(--green);
-    background: #fff;
+    border-color: var(--green); background: #fff;
     box-shadow: 0 0 0 3px rgba(0,102,51,0.1);
   }
 
   .btn {
-    width: 100%;
-    padding: 13px;
-    border: none;
-    border-radius: 10px;
-    font-size: 15px;
-    font-weight: 600;
-    font-family: 'Inter', sans-serif;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
+    width: 100%; padding: 13px; border: none;
+    border-radius: 10px; font-size: 15px; font-weight: 600;
+    font-family: 'Inter', sans-serif; cursor: pointer;
+    transition: all 0.2s; display: flex;
+    align-items: center; justify-content: center; gap: 8px;
   }
   .btn-primary {
     background: linear-gradient(135deg, var(--green), #1a8c4e);
-    color: #fff;
-    box-shadow: 0 4px 12px rgba(0,102,51,0.3);
+    color: #fff; box-shadow: 0 4px 12px rgba(0,102,51,0.3);
   }
   .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(0,102,51,0.4); }
-  .btn-primary:active { transform: translateY(0); }
   .btn-danger {
     background: linear-gradient(135deg, #c0392b, #e74c3c);
-    color: #fff;
-    box-shadow: 0 4px 12px rgba(192,57,43,0.25);
+    color: #fff; box-shadow: 0 4px 12px rgba(192,57,43,0.25);
   }
-  .btn-outline {
-    background: transparent;
-    color: var(--green);
-    border: 1.5px solid var(--green);
+  .btn-gold {
+    background: linear-gradient(135deg, var(--gold), #e6a832);
+    color: #fff; box-shadow: 0 4px 12px rgba(200,151,42,0.3);
   }
-  .btn-outline:hover { background: var(--green-light); }
+  .btn-gold:hover { transform: translateY(-1px); }
   .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none !important; }
 
   .alert {
-    padding: 12px 14px;
-    border-radius: 10px;
-    font-size: 14px;
-    font-weight: 500;
-    margin-top: 14px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    padding: 12px 14px; border-radius: 10px;
+    font-size: 14px; font-weight: 500; margin-top: 14px;
+    display: flex; align-items: center; gap: 8px;
   }
-  .alert.error { background: #fff0f0; color: #c0392b; border: 1px solid #ffcdd2; }
+  .alert.error   { background: #fff0f0; color: #c0392b; border: 1px solid #ffcdd2; }
   .alert.success { background: #f0fff7; color: #006633; border: 1px solid #c8e6c9; }
-  .hidden { display: none !important; }
 
-  /* ===== ABSEN SECTION ===== */
-  #absenSection { display: none; }
+  /* ABSEN SECTION */
   .absen-header {
     background: linear-gradient(135deg, var(--green-dark), var(--green));
-    padding: 20px 24px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    padding: 20px 24px; display: flex;
+    align-items: center; justify-content: space-between;
   }
   .absen-header-left h2 { color: #fff; font-size: 16px; font-weight: 700; }
-  .absen-header-left p { color: rgba(255,255,255,0.7); font-size: 12px; margin-top: 2px; }
+  .absen-header-left p  { color: rgba(255,255,255,0.7); font-size: 12px; margin-top: 2px; }
   .badge-petugas {
-    background: rgba(255,255,255,0.2);
-    color: #fff;
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
+    background: rgba(255,255,255,0.2); color: #fff;
+    padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;
   }
 
   .absen-body { padding: 20px; }
 
-  .select-wrapper {
-    margin-bottom: 12px;
-  }
-  .select-wrapper label {
-    display: block;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--gray-700);
-    margin-bottom: 6px;
-  }
+  .select-wrapper { margin-bottom: 12px; }
+  .select-wrapper label { display: block; font-size: 13px; font-weight: 600; color: var(--gray-700); margin-bottom: 6px; }
   .select-wrapper select {
-    width: 100%;
-    padding: 12px 14px;
-    border: 1.5px solid var(--gray-200);
-    border-radius: 10px;
-    font-size: 14px;
-    font-family: 'Inter', sans-serif;
-    color: var(--gray-700);
-    background: var(--gray-100);
+    width: 100%; padding: 12px 14px;
+    border: 1.5px solid var(--gray-200); border-radius: 10px;
+    font-size: 14px; font-family: 'Inter', sans-serif;
+    color: var(--gray-700); background: var(--gray-100);
     appearance: none;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 14px center;
-    cursor: pointer;
-    outline: none;
-    transition: border 0.2s;
+    background-repeat: no-repeat; background-position: right 14px center;
+    cursor: pointer; outline: none; transition: border 0.2s;
   }
   .select-wrapper select:focus { border-color: var(--green); background-color: #fff; }
   .select-wrapper select:disabled { opacity: 0.5; cursor: not-allowed; }
 
-  #reader {
-    width: 100%;
-    border-radius: 12px;
-    overflow: hidden;
-    margin: 4px 0 12px;
-    border: 2px dashed var(--gray-200);
-    min-height: 0;
+  /* DIVIDER */
+  .divider {
+    display: flex; align-items: center; gap: 10px;
+    margin: 16px 0; color: var(--gray-400); font-size: 12px; font-weight: 600;
   }
+  .divider::before, .divider::after {
+    content: ''; flex: 1;
+    height: 1px; background: var(--gray-200);
+  }
+
+  /* MANUAL INPUT */
+  .manual-box {
+    background: var(--gray-100);
+    border: 1.5px solid var(--gray-200);
+    border-radius: 12px; padding: 14px; margin-bottom: 12px;
+  }
+  .manual-box label { display: block; font-size: 13px; font-weight: 600; color: var(--gray-700); margin-bottom: 8px; }
+  .manual-row { display: flex; gap: 8px; }
+  .manual-row input {
+    flex: 1; padding: 11px 14px;
+    border: 1.5px solid var(--gray-200); border-radius: 10px;
+    font-size: 14px; font-family: 'Inter', sans-serif;
+    color: var(--gray-700); background: #fff;
+    outline: none; transition: border 0.2s;
+  }
+  .manual-row input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(200,151,42,0.1); }
+  .manual-row .btn {
+    width: auto; padding: 11px 16px; font-size: 13px; flex-shrink: 0;
+  }
+
+  /* SCANNER */
+  #reader { width: 100%; border-radius: 12px; overflow: hidden; margin: 4px 0 12px; border: 2px dashed var(--gray-200); min-height: 0; }
   #reader:not(:empty) { border: none; }
 
   .scan-result {
-    padding: 14px;
-    border-radius: 12px;
-    font-size: 14px;
-    font-weight: 600;
-    text-align: center;
-    animation: slideUp 0.3s ease;
+    padding: 14px; border-radius: 12px; font-size: 14px;
+    font-weight: 600; text-align: center;
+    animation: slideUp 0.3s ease; margin-bottom: 12px;
   }
   @keyframes slideUp {
     from { opacity: 0; transform: translateY(8px); }
@@ -261,28 +196,21 @@
   }
   .scan-result.success { background: #f0fff7; color: #006633; border: 1.5px solid #c8e6c9; }
   .scan-result.error   { background: #fff0f0; color: #c0392b; border: 1.5px solid #ffcdd2; }
+  .scan-result.info    { background: #fffbeb; color: #92400e; border: 1.5px solid #fde68a; }
 
   .action-buttons { display: flex; gap: 10px; margin-bottom: 12px; }
   .action-buttons .btn { flex: 1; }
 
   .footer-links {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 16px;
-    border-top: 1px solid var(--gray-200);
-    padding-top: 14px;
+    display: flex; justify-content: space-between;
+    margin-top: 16px; border-top: 1px solid var(--gray-200); padding-top: 14px;
   }
   .footer-links a, .footer-links span {
-    font-size: 13px;
-    color: var(--green);
-    font-weight: 600;
-    text-decoration: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 4px;
+    font-size: 13px; color: var(--green); font-weight: 600;
+    text-decoration: none; cursor: pointer;
+    display: flex; align-items: center; gap: 4px;
   }
-  .footer-links span { color: #c0392b; }
+  .footer-links .logout { color: #c0392b; }
 </style>
 </head>
 <body>
@@ -299,9 +227,8 @@
   <div id="loginSection">
     <div class="login-header">
       <div class="login-logo">
-        <img src="logo.png"
-             alt="Logo GP Ansor"
-             onerror="this.style.display='none'; this.parentElement.innerHTML='<span style=\'font-size:28px;font-weight:700;color:#006633\'>GP</span>'">
+        <img src="logo.png" alt="Logo GP Ansor"
+             onerror="this.style.display='none'; this.parentElement.innerHTML='<span style=\'font-size:26px;font-weight:700;color:#006633\'>GP</span>'">
       </div>
       <h1>Gerakan Pemuda Ansor</h1>
       <p>Sistem Absensi Digital</p>
@@ -317,7 +244,9 @@
                onkeydown="if(event.key==='Enter') login()">
       </div>
       <button class="btn btn-primary" onclick="login()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/>
+        </svg>
         Masuk
       </button>
       <div id="loginError" class="alert error hidden"></div>
@@ -325,7 +254,7 @@
   </div>
 
   <!-- ABSEN -->
-  <div id="absenSection">
+  <div id="absenSection" style="display:none;">
     <div class="absen-header">
       <div class="absen-header-left">
         <h2>📱 Scan Absensi</h2>
@@ -335,13 +264,13 @@
     </div>
 
     <div class="absen-body">
+      <!-- Pilih Pelatihan & Sesi -->
       <div class="select-wrapper">
         <label>Pelatihan</label>
         <select id="pelatihanSelect" onchange="onPelatihanChange()">
           <option value="">-- Pilih Pelatihan --</option>
         </select>
       </div>
-
       <div class="select-wrapper">
         <label>Sesi</label>
         <select id="sesiSelect" disabled>
@@ -349,9 +278,16 @@
         </select>
       </div>
 
+      <!-- Scan QR -->
+      <div class="divider">SCAN QR CODE</div>
+
       <div class="action-buttons">
         <button class="btn btn-primary" id="startBtn" onclick="startScanner()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="8" height="8"/><rect x="14" y="2" width="8" height="8"/><rect x="2" y="14" width="8" height="8"/><path d="M14 14h2v2h-2zM18 14h2v2h-2zM14 18h2v2h-2zM18 18h2v2h-2z"/></svg>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="2" width="8" height="8"/><rect x="14" y="2" width="8" height="8"/>
+            <rect x="2" y="14" width="8" height="8"/>
+            <path d="M14 14h2v2h-2zM18 14h2v2h-2zM14 18h2v2h-2zM18 18h2v2h-2z"/>
+          </svg>
           Mulai Scan
         </button>
         <button class="btn btn-danger hidden" id="stopBtn" onclick="stopScanner()">
@@ -360,11 +296,25 @@
       </div>
 
       <div id="reader"></div>
+
+      <!-- Input Manual -->
+      <div class="divider">ATAU INPUT MANUAL</div>
+
+      <div class="manual-box">
+        <label>🔑 ID Peserta (input manual)</label>
+        <div class="manual-row">
+          <input type="text" id="manualId" placeholder="Contoh: SUS-BEJ-0001"
+                 onkeydown="if(event.key==='Enter') absenManual()">
+          <button class="btn btn-gold" onclick="absenManual()">Absen</button>
+        </div>
+      </div>
+
+      <!-- Hasil -->
       <div id="resultBox" class="scan-result hidden"></div>
 
       <div class="footer-links">
         <a href="dashboard.html">📊 Dashboard</a>
-        <span onclick="logout()">🚪 Logout</span>
+        <span class="logout" onclick="logout()">🚪 Logout</span>
       </div>
     </div>
   </div>
@@ -372,13 +322,26 @@
 </div>
 
 <script>
+// =================== GANTI URL INI ===================
 const API_URL = 'https://script.google.com/macros/s/AKfycbyO6acFGHzzJC8kdFWvR7kMytbLRn8TNsZI0BlJIPRaMmeRBmsqPOXohXHnEzuaeYT6tw/exec';
+// =======================================================
 
-let petugasNama = '';
-let html5QrCode = null;
-let isProcessing = false;
+// Cek session — kalau sudah login sebelumnya, langsung ke absen
+let petugasNama    = sessionStorage.getItem('petugasNama') || '';
+let html5QrCode    = null;
+let isProcessing   = false;
 let sesiByPelatihan = {};
 
+window.addEventListener('DOMContentLoaded', () => {
+  if (petugasNama) {
+    document.getElementById('badgePetugas').textContent = '👤 ' + petugasNama;
+    document.getElementById('loginSection').style.display  = 'none';
+    document.getElementById('absenSection').style.display  = 'block';
+    loadSesi();
+  }
+});
+
+// ===== LOADING =====
 function showLoading(text = 'Memproses...') {
   document.getElementById('loadingText').textContent = text;
   document.getElementById('loadingOverlay').classList.remove('hidden');
@@ -387,6 +350,7 @@ function hideLoading() {
   document.getElementById('loadingOverlay').classList.add('hidden');
 }
 
+// ===== LOGIN =====
 async function login() {
   const user = document.getElementById('loginUser').value.trim();
   const pass = document.getElementById('loginPass').value.trim();
@@ -401,17 +365,15 @@ async function login() {
 
   showLoading('Memeriksa akun...');
   try {
-    const res = await fetch(API_URL, {
-      method: 'POST',
-      body: JSON.stringify({ action: 'login', user, password: pass })
-    });
+    const res  = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'login', user, password: pass }) });
     const data = await res.json();
 
     if (data.success) {
       petugasNama = data.nama;
-      document.getElementById('badgePetugas').textContent = '👤 ' + petugasNama;
-      document.getElementById('loginSection').style.display = 'none';
-      document.getElementById('absenSection').style.display = 'block';
+      sessionStorage.setItem('petugasNama', petugasNama);
+      document.getElementById('badgePetugas').textContent    = '👤 ' + petugasNama;
+      document.getElementById('loginSection').style.display  = 'none';
+      document.getElementById('absenSection').style.display  = 'block';
       loadSesi();
     } else {
       errBox.textContent = '✘ ' + (data.message || 'Login gagal');
@@ -429,20 +391,19 @@ function logout() {
   if (!confirm('Yakin ingin logout?')) return;
   stopScanner();
   petugasNama = '';
-  document.getElementById('loginUser').value = '';
-  document.getElementById('loginPass').value = '';
+  sessionStorage.removeItem('petugasNama');
+  document.getElementById('loginUser').value  = '';
+  document.getElementById('loginPass').value  = '';
   document.getElementById('loginError').classList.add('hidden');
   document.getElementById('absenSection').style.display = 'none';
   document.getElementById('loginSection').style.display = 'block';
 }
 
+// ===== LOAD SESI =====
 async function loadSesi() {
   showLoading('Memuat data sesi...');
   try {
-    const res = await fetch(API_URL, {
-      method: 'POST',
-      body: JSON.stringify({ action: 'getSesi' })
-    });
+    const res  = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'getSesi' }) });
     const data = await res.json();
     if (data.success) {
       sesiByPelatihan = data.sesiByPelatihan;
@@ -462,7 +423,7 @@ async function loadSesi() {
 }
 
 function onPelatihanChange() {
-  const pelatihan = document.getElementById('pelatihanSelect').value;
+  const pelatihan  = document.getElementById('pelatihanSelect').value;
   const sesiSelect = document.getElementById('sesiSelect');
   sesiSelect.innerHTML = '<option value="">-- Pilih Sesi --</option>';
   if (pelatihan && sesiByPelatihan[pelatihan]) {
@@ -477,13 +438,28 @@ function onPelatihanChange() {
   }
 }
 
-function startScanner() {
+// ===== VALIDASI SEBELUM ABSEN =====
+function validatePilihan() {
   const pelatihan = document.getElementById('pelatihanSelect').value;
-  const sesi = document.getElementById('sesiSelect').value;
+  const sesi      = document.getElementById('sesiSelect').value;
   if (!pelatihan || !sesi) {
-    alert('Pilih Pelatihan dan Sesi terlebih dahulu');
-    return;
+    showResult('⚠ Pilih Pelatihan dan Sesi terlebih dahulu', 'info');
+    return null;
   }
+  return { pelatihan, sesi };
+}
+
+// ===== TAMPILKAN HASIL =====
+function showResult(msg, type = 'success') {
+  const box = document.getElementById('resultBox');
+  box.className  = 'scan-result ' + type;
+  box.innerHTML  = msg;
+  box.classList.remove('hidden');
+}
+
+// ===== SCANNER QR =====
+function startScanner() {
+  if (!validatePilihan()) return;
   document.getElementById('startBtn').classList.add('hidden');
   document.getElementById('stopBtn').classList.remove('hidden');
 
@@ -500,10 +476,7 @@ function startScanner() {
 
 function stopScanner() {
   if (html5QrCode) {
-    html5QrCode.stop().then(() => {
-      html5QrCode.clear();
-      html5QrCode = null;
-    }).catch(() => {});
+    html5QrCode.stop().then(() => { html5QrCode.clear(); html5QrCode = null; }).catch(() => {});
   }
   document.getElementById('startBtn').classList.remove('hidden');
   document.getElementById('stopBtn').classList.add('hidden');
@@ -511,50 +484,60 @@ function stopScanner() {
 
 async function onScanSuccess(decodedText) {
   if (isProcessing) return;
+  const pilihan = validatePilihan();
+  if (!pilihan) return;
   isProcessing = true;
+  showResult('⏳ Memproses...', 'info');
+  await kirimAbsen(decodedText.trim(), pilihan.pelatihan, pilihan.sesi);
+  setTimeout(() => { isProcessing = false; }, 2500);
+}
 
-  const pelatihan = document.getElementById('pelatihanSelect').value;
-  const sesi = document.getElementById('sesiSelect').value;
-  const resultBox = document.getElementById('resultBox');
+// ===== ABSEN MANUAL =====
+async function absenManual() {
+  const idManual = document.getElementById('manualId').value.trim();
+  if (!idManual) {
+    showResult('⚠ ID peserta tidak boleh kosong', 'info');
+    return;
+  }
+  const pilihan = validatePilihan();
+  if (!pilihan) return;
 
-  resultBox.className = 'scan-result';
-  resultBox.textContent = '⏳ Memproses...';
+  showResult('⏳ Memproses...', 'info');
+  await kirimAbsen(idManual, pilihan.pelatihan, pilihan.sesi);
+  document.getElementById('manualId').value = '';
+}
 
+// ===== KIRIM ABSEN KE SERVER =====
+async function kirimAbsen(id, pelatihan, sesi) {
   try {
-    const res = await fetch(API_URL, {
+    const res  = await fetch(API_URL, {
       method: 'POST',
-      body: JSON.stringify({ action: 'absen', id: decodedText, sesi, pelatihan, petugas: petugasNama })
+      body: JSON.stringify({ action: 'absen', id, sesi, pelatihan, petugas: petugasNama })
     });
     const data = await res.json();
 
     if (data.success) {
-      resultBox.className = 'scan-result success';
-      resultBox.innerHTML = `✅ <strong>${data.nama}</strong><br><small>${data.pelatihan} · ${data.wilayah}</small>`;
+      showResult(`✅ <strong>${data.nama}</strong><br><small>${data.pelatihan} · ${data.wilayah}</small>`, 'success');
       beep();
     } else {
-      resultBox.className = 'scan-result error';
-      resultBox.textContent = '❌ ' + (data.message || 'Gagal absen');
+      showResult('❌ ' + (data.message || 'Gagal absen'), 'error');
     }
   } catch (e) {
-    resultBox.className = 'scan-result error';
-    resultBox.textContent = '❌ Gagal terhubung ke server';
+    showResult('❌ Gagal terhubung ke server', 'error');
   }
-
-  setTimeout(() => { isProcessing = false; }, 2500);
 }
 
+// ===== BEEP =====
 function beep() {
   try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const osc = ctx.createOscillator();
+    const ctx  = new (window.AudioContext || window.webkitAudioContext)();
+    const osc  = ctx.createOscillator();
     const gain = ctx.createGain();
-    osc.connect(gain);
-    gain.connect(ctx.destination);
+    osc.connect(gain); gain.connect(ctx.destination);
     osc.frequency.value = 880;
     gain.gain.setValueAtTime(0.3, ctx.currentTime);
     gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
-    osc.start();
-    osc.stop(ctx.currentTime + 0.3);
+    osc.start(); osc.stop(ctx.currentTime + 0.3);
   } catch(e) {}
 }
 </script>
