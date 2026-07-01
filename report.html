@@ -303,9 +303,17 @@ function renderTable() {
 function jamSaja(val) {
   if (!val) return '—';
   const str = String(val);
+
+  // kalau format ISO dengan "T", contoh: 1899-12-30T08:14:00.000Z
+  if (str.includes('T')) {
+    const timePart = str.split('T')[1]; // ambil bagian setelah T -> "08:14:00.000Z"
+    return timePart.replace('Z', '').split('.')[0]; // buang .000 dan Z -> "08:14:00"
+  }
+
   // kalau format "HH:mm:ss" langsung
   if (/^\d{1,2}:\d{2}(:\d{2})?$/.test(str)) return str;
-  // kalau ada tanggal di depan, ambil bagian waktu saja
+
+  // kalau ada tanggal di depan (dipisah spasi), ambil bagian waktu saja
   const parts = str.split(' ');
   return parts.length > 1 ? parts[parts.length - 1] : str;
 }
@@ -408,12 +416,13 @@ async function downloadPDF() {
     },
     alternateRowStyles: { fillColor: [240, 248, 244] },
     columnStyles: {
-      0: { cellWidth: 12,  halign: 'center' },
-      1: { cellWidth: 30 },
-      2: { cellWidth: 60 },
-      3: { cellWidth: 40 },
-      4: { cellWidth: 22, halign: 'center' },
-      5: { cellWidth: 18, halign: 'center', fontStyle: 'bold' }
+    0: { cellWidth: 14, halign: 'center', cellPadding: { top: 2, right: 1, bottom: 2, left: 1 } },
+    1: { cellWidth: 28 },
+    2: { cellWidth: 60 },
+    3: { cellWidth: 40 },
+    4: { cellWidth: 22, halign: 'center' },
+    5: { cellWidth: 18, halign: 'center', fontStyle: 'bold' }
+},  
     },
     didParseCell(data) {
       if (data.column.index === 5 && data.section === 'body') {
