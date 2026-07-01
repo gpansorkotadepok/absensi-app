@@ -22,61 +22,56 @@
   body { font-family: 'Inter', sans-serif; background: #f0f4f0; color: var(--gray-700); min-height: 100vh; }
 
   #loadingOverlay {
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,0.45);
-    backdrop-filter: blur(4px);
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    z-index: 999; gap: 16px;
+    position: fixed; inset: 0; background: rgba(0,0,0,0.45);
+    backdrop-filter: blur(4px); display: flex; flex-direction: column;
+    align-items: center; justify-content: center; z-index: 999; gap: 16px;
   }
   #loadingOverlay.hidden { display: none; }
   .spinner {
     width: 52px; height: 52px;
     border: 4px solid rgba(255,255,255,0.2);
-    border-top: 4px solid #fff;
-    border-radius: 50%;
+    border-top: 4px solid #fff; border-radius: 50%;
     animation: spin 0.8s linear infinite;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
   .spinner-text { color: #fff; font-size: 14px; font-weight: 500; }
   .hidden { display: none !important; }
 
+  /* TOPBAR */
   .topbar {
     background: linear-gradient(135deg, var(--green-dark), var(--green));
-    padding: 16px 20px;
-    display: flex; align-items: center; justify-content: space-between;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+    padding: 16px 20px; display: flex; align-items: center;
+    justify-content: space-between; box-shadow: 0 2px 12px rgba(0,0,0,0.2);
     position: sticky; top: 0; z-index: 10;
   }
   .topbar-left { display: flex; align-items: center; gap: 12px; }
   .topbar-logo {
-    width: 38px; height: 38px; border-radius: 50%;
-    background: #fff; display: flex; align-items: center;
-    justify-content: center; overflow: hidden; flex-shrink: 0;
+    width: 38px; height: 38px; border-radius: 50%; background: #fff;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden; flex-shrink: 0;
   }
   .topbar-logo img { width: 100%; height: 100%; object-fit: contain; }
   .topbar h1 { color: #fff; font-size: 16px; font-weight: 700; }
   .topbar p  { color: rgba(255,255,255,0.7); font-size: 12px; }
   .topbar-back {
-    background: rgba(255,255,255,0.15); color: #fff;
-    text-decoration: none; padding: 8px 14px;
-    border-radius: 20px; font-size: 13px; font-weight: 600;
+    background: rgba(255,255,255,0.15); color: #fff; text-decoration: none;
+    padding: 8px 14px; border-radius: 20px; font-size: 13px; font-weight: 600;
     transition: background 0.2s; white-space: nowrap;
   }
   .topbar-back:hover { background: rgba(255,255,255,0.25); }
 
-  .wrapper { max-width: 960px; margin: 0 auto; padding: 20px 16px; }
+  .wrapper { max-width: 1060px; margin: 0 auto; padding: 20px 16px; }
 
+  /* FILTERS */
   .filters {
-    display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; align-items: center;
+    display: flex; gap: 10px; flex-wrap: wrap;
+    margin-bottom: 20px; align-items: center;
   }
   .filter-select {
-    flex: 1; min-width: 150px;
-    padding: 11px 36px 11px 14px;
+    flex: 1; min-width: 150px; padding: 11px 36px 11px 14px;
     border: 1.5px solid var(--gray-200); border-radius: 10px;
     font-size: 14px; font-family: 'Inter', sans-serif;
-    color: var(--gray-700); background: #fff;
-    appearance: none;
+    color: var(--gray-700); background: #fff; appearance: none;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
     background-repeat: no-repeat; background-position: right 12px center;
     box-shadow: var(--shadow); cursor: pointer; outline: none; transition: border 0.2s;
@@ -84,27 +79,37 @@
   .filter-select:focus { border-color: var(--green); }
 
   .btn-filter {
-    padding: 11px 16px; border-radius: 10px; font-size: 13px;
-    font-weight: 600; font-family: 'Inter', sans-serif;
-    cursor: pointer; box-shadow: var(--shadow); transition: all 0.2s;
-    white-space: nowrap; border: 1.5px solid transparent;
+    padding: 11px 16px; border-radius: 10px; font-size: 13px; font-weight: 600;
+    font-family: 'Inter', sans-serif; cursor: pointer; box-shadow: var(--shadow);
+    transition: all 0.2s; white-space: nowrap; border: 1.5px solid transparent;
     text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
   }
   .btn-refresh { background: #fff; color: var(--green); border-color: var(--green); }
   .btn-refresh:hover { background: var(--green-light); }
   .btn-report { background: var(--gold); color: #fff; border-color: var(--gold); }
   .btn-report:hover { opacity: 0.9; }
-  .btn-report.disabled { background: var(--gray-200); color: var(--gray-400); border-color: var(--gray-200); pointer-events: none; }
+  .btn-report.disabled {
+    background: var(--gray-200); color: var(--gray-400);
+    border-color: var(--gray-200); pointer-events: none;
+  }
 
+  /* MODE BADGE */
+  .mode-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700;
+    letter-spacing: 0.3px; margin-bottom: 16px;
+  }
+  .mode-badge.kelengkapan { background: #fff8e7; color: var(--gold); border: 1.5px solid #ffe082; }
+  .mode-badge.absensi     { background: var(--green-light); color: var(--green); border: 1.5px solid #a5d6a7; }
+
+  /* STAT CARDS */
   .cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
     gap: 12px; margin-bottom: 20px;
   }
   .stat-card {
-    background: #fff; border-radius: var(--radius);
-    padding: 18px 16px; box-shadow: var(--shadow);
-    border-left: 4px solid transparent; transition: transform 0.2s;
+    background: #fff; border-radius: var(--radius); padding: 18px 16px;
+    box-shadow: var(--shadow); border-left: 4px solid transparent; transition: transform 0.2s;
   }
   .stat-card:hover { transform: translateY(-2px); }
   .stat-card.total  { border-color: #2563eb; }
@@ -121,6 +126,7 @@
   .stat-card.belum  .value { color: #e74c3c; }
   .stat-card.persen .value { color: var(--gold); }
 
+  /* PROGRESS */
   .progress-card {
     background: #fff; border-radius: var(--radius);
     padding: 18px 20px; margin-bottom: 20px; box-shadow: var(--shadow);
@@ -129,26 +135,22 @@
     font-size: 14px; font-weight: 600; color: var(--gray-700);
     margin-bottom: 12px; display: flex; justify-content: space-between;
   }
-  .progress-track {
-    width: 100%; height: 20px; background: var(--gray-100);
-    border-radius: 10px; overflow: hidden;
-  }
+  .progress-track { width: 100%; height: 20px; background: var(--gray-100); border-radius: 10px; overflow: hidden; }
   .progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #34d399, var(--green));
+    height: 100%; background: linear-gradient(90deg, #34d399, var(--green));
     border-radius: 10px; transition: width 0.6s cubic-bezier(0.34,1.56,0.64,1);
     display: flex; align-items: center; justify-content: flex-end;
     padding-right: 8px; color: #fff; font-size: 11px; font-weight: 700;
   }
 
+  /* TABLE CARD */
   .table-card { background: #fff; border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
   .table-card-header { padding: 16px 20px; border-bottom: 1px solid var(--gray-100); }
   .table-card-header h3 { font-size: 15px; font-weight: 700; margin-bottom: 12px; }
   .tabs { display: flex; gap: 6px; flex-wrap: wrap; }
   .tab-btn {
-    padding: 7px 16px; border-radius: 20px;
-    border: 1.5px solid var(--gray-200); background: var(--gray-100);
-    cursor: pointer; font-size: 13px; font-weight: 600;
+    padding: 7px 16px; border-radius: 20px; border: 1.5px solid var(--gray-200);
+    background: var(--gray-100); cursor: pointer; font-size: 13px; font-weight: 600;
     font-family: 'Inter', sans-serif; color: var(--gray-400); transition: all 0.2s;
   }
   .tab-btn:hover { border-color: var(--green); color: var(--green); }
@@ -156,37 +158,50 @@
 
   .search-bar { padding: 12px 20px; border-bottom: 1px solid var(--gray-100); }
   .search-bar input {
-    width: 100%; padding: 10px 14px;
-    border: 1.5px solid var(--gray-200); border-radius: 10px;
-    font-size: 14px; font-family: 'Inter', sans-serif;
+    width: 100%; padding: 10px 14px; border: 1.5px solid var(--gray-200);
+    border-radius: 10px; font-size: 14px; font-family: 'Inter', sans-serif;
     outline: none; transition: border 0.2s; background: var(--gray-100);
   }
   .search-bar input:focus { border-color: var(--green); background: #fff; }
 
   .table-wrap { overflow-x: auto; }
-  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
   th {
-    padding: 10px 16px; text-align: left;
-    font-size: 11px; font-weight: 700; text-transform: uppercase;
-    letter-spacing: 0.5px; color: var(--gray-400);
+    padding: 10px 12px; text-align: left; font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.5px; color: var(--gray-400);
     border-bottom: 1px solid var(--gray-100); white-space: nowrap;
   }
-  td { padding: 12px 16px; border-bottom: 1px solid var(--gray-100); vertical-align: middle; }
+  td { padding: 10px 12px; border-bottom: 1px solid var(--gray-100); vertical-align: middle; }
   tr:last-child td { border-bottom: none; }
   tr:hover td { background: var(--gray-100); }
-  .td-id { font-family: monospace; font-size: 12px; color: var(--gray-400); }
-
-  .nama-link {
-    color: var(--green); font-weight: 600; text-decoration: none; cursor: pointer;
-  }
+  .td-id { font-family: monospace; font-size: 11px; color: var(--gray-400); }
+  .nama-link { color: var(--green); font-weight: 600; text-decoration: none; }
   .nama-link:hover { text-decoration: underline; }
 
+  /* STATUS ABSENSI */
   .status-icon {
     width: 28px; height: 28px; border-radius: 50%;
     display: inline-flex; align-items: center; justify-content: center; font-size: 14px;
   }
   .status-icon.hadir { background: #d1fae5; color: #006633; }
   .status-icon.belum { background: #fee2e2; color: #c0392b; }
+
+  /* STATUS KELENGKAPAN — centang/silang kecil */
+  .ck {
+    width: 24px; height: 24px; border-radius: 6px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700;
+  }
+  .ck.ok  { background: #d1fae5; color: #006633; }
+  .ck.no  { background: #fee2e2; color: #c0392b; }
+
+  /* INFO HINT */
+  .hint-box {
+    background: #fff8e7; border: 1.5px solid #ffe082;
+    border-radius: 12px; padding: 14px 18px;
+    font-size: 13px; color: #92400e; margin-bottom: 20px;
+    display: flex; align-items: center; gap: 10px;
+  }
 
   .empty-state { text-align: center; padding: 40px 20px; color: var(--gray-400); }
   .empty-state .emoji { font-size: 40px; margin-bottom: 10px; }
@@ -197,7 +212,7 @@
 
 <div id="loadingOverlay">
   <div class="spinner"></div>
-  <div class="spinner-text">Memuat data...</div>
+  <div class="spinner-text" id="loadingText">Memuat data...</div>
 </div>
 
 <div class="topbar">
@@ -214,69 +229,52 @@
 </div>
 
 <div class="wrapper">
+
+  <!-- FILTER -->
   <div class="filters">
     <select class="filter-select" id="filterPelatihan" onchange="onFilterPelatihanChange()">
       <option value="">Semua Pelatihan</option>
     </select>
-    <select class="filter-select" id="filterSesi" onchange="render()">
-      <option value="">Semua Sesi</option>
+    <select class="filter-select" id="filterSesi" onchange="onFilterSesiChange()">
+      <option value="">-- Pilih Sesi --</option>
     </select>
-    <button class="btn-filter btn-refresh" onclick="loadDashboard()">⟳ Refresh</button>
+    <button class="btn-filter btn-refresh" onclick="refreshData()">⟳ Refresh</button>
     <a id="btnReport" class="btn-filter btn-report disabled" href="#">📄 Report Sesi</a>
   </div>
 
-  <div class="cards">
-    <div class="stat-card total">
-      <div class="label">Total Peserta</div>
-      <div class="value" id="cardTotal">—</div>
+  <!-- STAT CARDS (hanya muncul di mode absensi) -->
+  <div id="statsSection">
+    <div class="cards">
+      <div class="stat-card total"><div class="label">Total Peserta</div><div class="value" id="cardTotal">—</div></div>
+      <div class="stat-card hadir"><div class="label">Sudah Absen</div><div class="value" id="cardHadir">—</div></div>
+      <div class="stat-card belum"><div class="label">Belum Absen</div><div class="value" id="cardBelum">—</div></div>
+      <div class="stat-card persen"><div class="label">Kehadiran</div><div class="value" id="cardPersen">—</div></div>
     </div>
-    <div class="stat-card hadir">
-      <div class="label">Sudah Absen</div>
-      <div class="value" id="cardHadir">—</div>
-    </div>
-    <div class="stat-card belum">
-      <div class="label">Belum Absen</div>
-      <div class="value" id="cardBelum">—</div>
-    </div>
-    <div class="stat-card persen">
-      <div class="label">Kehadiran</div>
-      <div class="value" id="cardPersen">—</div>
+    <div class="progress-card">
+      <h3>Progress Kehadiran <span id="progressLabel" style="color:var(--green)">0%</span></h3>
+      <div class="progress-track">
+        <div class="progress-fill" id="progressFill" style="width:0%"></div>
+      </div>
     </div>
   </div>
 
-  <div class="progress-card">
-    <h3>
-      Progress Kehadiran
-      <span id="progressLabel" style="color:var(--green)">0%</span>
-    </h3>
-    <div class="progress-track">
-      <div class="progress-fill" id="progressFill" style="width:0%"></div>
-    </div>
-  </div>
-
+  <!-- TABLE CARD -->
   <div class="table-card">
     <div class="table-card-header">
-      <h3>Daftar Peserta</h3>
-      <div class="tabs">
+      <h3 id="tableTitle">Kelengkapan Peserta</h3>
+      <!-- Tab (hanya untuk mode absensi) -->
+      <div class="tabs hidden" id="absensiTabs">
         <button class="tab-btn active" id="tabSemua" onclick="setTab('semua')">Semua</button>
         <button class="tab-btn" id="tabHadir" onclick="setTab('hadir')">✓ Hadir</button>
         <button class="tab-btn" id="tabBelum" onclick="setTab('belum')">✗ Belum</button>
       </div>
     </div>
     <div class="search-bar">
-      <input type="text" id="searchBox" placeholder="🔍 Cari nama atau ID peserta..." oninput="render()">
+      <input type="text" id="searchBox" placeholder="🔍 Cari nama peserta..." oninput="renderTable()">
     </div>
     <div class="table-wrap">
       <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Nama</th>
-            <th>Pelatihan</th>
-            <th>Wilayah</th>
-            <th style="text-align:center">Status</th>
-          </tr>
-        </thead>
+        <thead id="tableHead"></thead>
         <tbody id="tableBody"></tbody>
       </table>
       <div id="emptyState" class="empty-state hidden">
@@ -285,29 +283,47 @@
       </div>
     </div>
   </div>
+
 </div>
 
 <script>
 const API_URL = 'https://script.google.com/macros/s/AKfycbyO6acFGHzzJC8kdFWvR7kMytbLRn8TNsZI0BlJIPRaMmeRBmsqPOXohXHnEzuaeYT6tw/exec';
-let dashboardData = null;
-let currentTab = 'semua';
 
-async function loadDashboard() {
+let dashboardData    = null;  // data absensi + peserta
+let kelengkapanData  = null;  // data kelengkapan peserta
+let currentTab       = 'semua';
+let currentMode      = 'kelengkapan'; // 'kelengkapan' | 'absensi'
+
+// ===== LOADING =====
+function showLoading(txt = 'Memuat data...') {
+  document.getElementById('loadingText').textContent = txt;
   document.getElementById('loadingOverlay').classList.remove('hidden');
+}
+function hideLoading() {
+  document.getElementById('loadingOverlay').classList.add('hidden');
+}
+
+// ===== INIT =====
+async function init() {
+  showLoading('Memuat data...');
   try {
+    // load dashboard data (peserta + absensi + sesi) sekali
     const res  = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'getDashboard' }) });
     const data = await res.json();
     if (!data.success) { alert('Gagal memuat data'); return; }
     dashboardData = data;
     populateFilters(data);
-    render();
-  } catch (e) {
+
+    // langsung load kelengkapan (default view)
+    await loadKelengkapan('');
+  } catch(e) {
     alert('Gagal terhubung ke server');
   } finally {
-    document.getElementById('loadingOverlay').classList.add('hidden');
+    hideLoading();
   }
 }
 
+// ===== POPULATE FILTER PELATIHAN =====
 function populateFilters(data) {
   const sel = document.getElementById('filterPelatihan');
   sel.innerHTML = '<option value="">Semua Pelatihan</option>';
@@ -316,33 +332,274 @@ function populateFilters(data) {
     opt.value = p; opt.textContent = p;
     sel.appendChild(opt);
   });
-  updateSesiFilter('');
+  // sesi kosong dulu
+  document.getElementById('filterSesi').innerHTML = '<option value="">-- Pilih Sesi --</option>';
 }
 
-function updateSesiFilter(pelatihan) {
-  const sel = document.getElementById('filterSesi');
-  sel.innerHTML = '<option value="">Semua Sesi</option>';
-  let list = [];
+// ===== EVENT: ganti pelatihan =====
+async function onFilterPelatihanChange() {
+  const pelatihan = document.getElementById('filterPelatihan').value;
+
+  // update dropdown sesi
+  const selSesi = document.getElementById('filterSesi');
+  selSesi.innerHTML = '<option value="">-- Pilih Sesi --</option>';
   if (pelatihan && dashboardData.sesiByPelatihan[pelatihan]) {
-    list = dashboardData.sesiByPelatihan[pelatihan];
-  } else {
-    const set = {};
-    Object.values(dashboardData.sesiByPelatihan).forEach(arr => arr.forEach(s => set[s] = true));
-    list = Object.keys(set);
+    dashboardData.sesiByPelatihan[pelatihan].forEach(s => {
+      const opt = document.createElement('option');
+      opt.value = s; opt.textContent = s;
+      selSesi.appendChild(opt);
+    });
   }
-  list.forEach(s => {
-    const opt = document.createElement('option');
-    opt.value = s; opt.textContent = s;
-    sel.appendChild(opt);
-  });
+
   updateReportBtn();
+
+  // karena sesi belum dipilih → tampilkan kelengkapan
+  showLoading('Memuat kelengkapan...');
+  try {
+    await loadKelengkapan(pelatihan);
+  } finally {
+    hideLoading();
+  }
 }
 
-function onFilterPelatihanChange() {
-  updateSesiFilter(document.getElementById('filterPelatihan').value);
-  render();
+// ===== EVENT: ganti sesi =====
+async function onFilterSesiChange() {
+  updateReportBtn();
+  const sesi = document.getElementById('filterSesi').value;
+  if (sesi) {
+    // sesi sudah dipilih → mode absensi
+    showLoading('Memuat absensi...');
+    try {
+      switchToAbsensi();
+    } finally {
+      hideLoading();
+    }
+  } else {
+    // sesi dikosongkan → balik ke kelengkapan
+    const pelatihan = document.getElementById('filterPelatihan').value;
+    showLoading('Memuat kelengkapan...');
+    try {
+      await loadKelengkapan(pelatihan);
+    } finally {
+      hideLoading();
+    }
+  }
 }
 
+// ===== REFRESH =====
+async function refreshData() {
+  showLoading('Menyegarkan data...');
+  kelengkapanData = null;
+  try {
+    const res  = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'getDashboard' }) });
+    const data = await res.json();
+    if (data.success) dashboardData = data;
+    const pelatihan = document.getElementById('filterPelatihan').value;
+    const sesi      = document.getElementById('filterSesi').value;
+    if (sesi) {
+      switchToAbsensi();
+    } else {
+      await loadKelengkapan(pelatihan);
+    }
+  } catch(e) {
+    alert('Gagal terhubung ke server');
+  } finally {
+    hideLoading();
+  }
+}
+
+// ===== LOAD KELENGKAPAN =====
+async function loadKelengkapan(pelatihan) {
+  const res  = await fetch(API_URL, {
+    method: 'POST',
+    body: JSON.stringify({ action: 'getKelengkapan', pelatihan })
+  });
+  const data = await res.json();
+  if (!data.success) { alert('Gagal memuat kelengkapan'); return; }
+  kelengkapanData = data.list;
+  currentMode = 'kelengkapan';
+  renderKelengkapanUI();
+}
+
+// ===== UI KELENGKAPAN =====
+function renderKelengkapanUI() {
+  // sembunyikan stat cards & progress
+  document.getElementById('statsSection').classList.add('hidden');
+  // sembunyikan tab absensi
+  document.getElementById('absensiTabs').classList.add('hidden');
+  // judul tabel
+  const pelatihan = document.getElementById('filterPelatihan').value;
+  document.getElementById('tableTitle').textContent =
+    '📋 Kelengkapan Peserta' + (pelatihan ? ' — ' + pelatihan : ' — Semua Pelatihan');
+
+  renderTable();
+}
+
+// ===== SWITCH KE MODE ABSENSI =====
+function switchToAbsensi() {
+  currentMode = 'absensi';
+  // tampilkan stat cards & progress
+  document.getElementById('statsSection').classList.remove('hidden');
+  // tampilkan tab
+  document.getElementById('absensiTabs').classList.remove('hidden');
+
+  const pelatihan = document.getElementById('filterPelatihan').value;
+  const sesi      = document.getElementById('filterSesi').value;
+  document.getElementById('tableTitle').textContent =
+    '📊 Absensi — ' + (pelatihan || 'Semua') + ' · ' + sesi;
+
+  renderTable();
+}
+
+// ===== RENDER TABLE (dispatch ke mode) =====
+function renderTable() {
+  if (currentMode === 'kelengkapan') {
+    renderKelengkapanTable();
+  } else {
+    renderAbsensiTable();
+  }
+}
+
+// ===== RENDER TABEL KELENGKAPAN =====
+function renderKelengkapanTable() {
+  if (!kelengkapanData) return;
+  const search = document.getElementById('searchBox').value.toLowerCase().trim();
+
+  let list = kelengkapanData;
+  if (search) list = list.filter(p => p.nama.toLowerCase().includes(search) || (p.wilayah||'').toLowerCase().includes(search));
+
+  // header
+  document.getElementById('tableHead').innerHTML = `
+    <tr>
+      <th>No</th>
+      <th>Nama Peserta</th>
+      <th>Pelatihan</th>
+      <th>Wilayah</th>
+      <th style="text-align:center">Bayar</th>
+      <th style="text-align:center">KTA</th>
+      <th style="text-align:center">KTP</th>
+      <th style="text-align:center">Sertif.</th>
+      <th style="text-align:center">Foto</th>
+      <th style="text-align:center">Surat</th>
+    </tr>
+  `;
+
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = '';
+
+  if (list.length === 0) {
+    document.getElementById('emptyState').classList.remove('hidden');
+    return;
+  }
+  document.getElementById('emptyState').classList.add('hidden');
+
+  list.forEach((p, i) => {
+    const ck = (val) => `<span class="ck ${val ? 'ok' : 'no'}">${val ? '✓' : '✗'}</span>`;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="color:var(--gray-400);font-size:12px">${i + 1}</td>
+      <td><strong>${p.nama}</strong></td>
+      <td>${p.pelatihan}</td>
+      <td>${p.wilayah}</td>
+      <td style="text-align:center">${ck(p.pembayaran)}</td>
+      <td style="text-align:center">${ck(p.kta)}</td>
+      <td style="text-align:center">${ck(p.ktp)}</td>
+      <td style="text-align:center">${ck(p.sertifikat)}</td>
+      <td style="text-align:center">${ck(p.pasFoto)}</td>
+      <td style="text-align:center">${ck(p.suratSehat)}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// ===== RENDER TABEL ABSENSI =====
+function renderAbsensiTable() {
+  if (!dashboardData) return;
+
+  const pelatihanFilter = document.getElementById('filterPelatihan').value;
+  const sesiFilter      = document.getElementById('filterSesi').value;
+  const search          = document.getElementById('searchBox').value.toLowerCase().trim();
+
+  let peserta = dashboardData.peserta;
+  if (pelatihanFilter) peserta = peserta.filter(p => p.pelatihan === pelatihanFilter);
+
+  const sesiToCheck = sesiFilter ? [sesiFilter] : [];
+
+  const withStatus = peserta.map(p => {
+    const hadir = sesiToCheck.some(s => dashboardData.absensiSet[p.id + '|' + s]);
+    return { ...p, hadir };
+  });
+
+  // stat cards
+  const total  = withStatus.length;
+  const hadir  = withStatus.filter(p => p.hadir).length;
+  const belum  = total - hadir;
+  const persen = total ? Math.round((hadir / total) * 100) : 0;
+
+  document.getElementById('cardTotal').textContent   = total;
+  document.getElementById('cardHadir').textContent   = hadir;
+  document.getElementById('cardBelum').textContent   = belum;
+  document.getElementById('cardPersen').textContent  = persen + '%';
+  document.getElementById('progressLabel').textContent = persen + '%';
+  const fill = document.getElementById('progressFill');
+  fill.style.width = persen + '%';
+  fill.textContent = persen > 8 ? persen + '%' : '';
+
+  // filter tab + search
+  let filtered = withStatus;
+  if (currentTab === 'hadir') filtered = filtered.filter(p => p.hadir);
+  if (currentTab === 'belum') filtered = filtered.filter(p => !p.hadir);
+  if (search) filtered = filtered.filter(p =>
+    p.nama.toLowerCase().includes(search) || p.id.toLowerCase().includes(search)
+  );
+
+  // header
+  document.getElementById('tableHead').innerHTML = `
+    <tr>
+      <th>ID</th>
+      <th>Nama</th>
+      <th>Pelatihan</th>
+      <th>Wilayah</th>
+      <th style="text-align:center">Status</th>
+    </tr>
+  `;
+
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = '';
+
+  if (filtered.length === 0) {
+    document.getElementById('emptyState').classList.remove('hidden');
+    return;
+  }
+  document.getElementById('emptyState').classList.add('hidden');
+
+  filtered.forEach(p => {
+    const tr = document.createElement('tr');
+    const detailUrl = `peserta.html?id=${encodeURIComponent(p.id)}&pelatihan=${encodeURIComponent(p.pelatihan)}`;
+    tr.innerHTML = `
+      <td class="td-id">${p.id}</td>
+      <td><a class="nama-link" href="${detailUrl}">${p.nama}</a></td>
+      <td>${p.pelatihan}</td>
+      <td>${p.wilayah}</td>
+      <td style="text-align:center">
+        <span class="status-icon ${p.hadir ? 'hadir' : 'belum'}">${p.hadir ? '✓' : '✗'}</span>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// ===== TAB (hanya mode absensi) =====
+function setTab(tab) {
+  currentTab = tab;
+  ['semua','hadir','belum'].forEach(t => {
+    document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1))
+      .classList.toggle('active', t === tab);
+  });
+  renderTable();
+}
+
+// ===== REPORT BTN =====
 function updateReportBtn() {
   const pelatihan = document.getElementById('filterPelatihan').value;
   const sesi      = document.getElementById('filterSesi').value;
@@ -356,95 +613,8 @@ function updateReportBtn() {
   }
 }
 
-document.getElementById('filterSesi').addEventListener('change', updateReportBtn);
-
-function setTab(tab) {
-  currentTab = tab;
-  ['semua','hadir','belum'].forEach(t => {
-    document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1))
-      .classList.toggle('active', t === tab);
-  });
-  render();
-}
-
-function render() {
-  if (!dashboardData) return;
-
-  const pelatihanFilter = document.getElementById('filterPelatihan').value;
-  const sesiFilter      = document.getElementById('filterSesi').value;
-  const searchTerm      = document.getElementById('searchBox').value.toLowerCase().trim();
-
-  let peserta = dashboardData.peserta;
-  if (pelatihanFilter) peserta = peserta.filter(p => p.pelatihan === pelatihanFilter);
-
-  let sesiToCheck;
-  if (sesiFilter) {
-    sesiToCheck = [sesiFilter];
-  } else if (pelatihanFilter && dashboardData.sesiByPelatihan[pelatihanFilter]) {
-    sesiToCheck = dashboardData.sesiByPelatihan[pelatihanFilter];
-  } else {
-    const set = {};
-    Object.values(dashboardData.sesiByPelatihan).forEach(arr => arr.forEach(s => set[s] = true));
-    sesiToCheck = Object.keys(set);
-  }
-
-  const withStatus = peserta.map(p => {
-    const hadir = sesiToCheck.some(s => dashboardData.absensiSet[p.id + '|' + s]);
-    return { ...p, hadir };
-  });
-
-  const total  = withStatus.length;
-  const hadir  = withStatus.filter(p => p.hadir).length;
-  const belum  = total - hadir;
-  const persen = total ? Math.round((hadir / total) * 100) : 0;
-
-  document.getElementById('cardTotal').textContent  = total;
-  document.getElementById('cardHadir').textContent  = hadir;
-  document.getElementById('cardBelum').textContent  = belum;
-  document.getElementById('cardPersen').textContent = persen + '%';
-  document.getElementById('progressLabel').textContent = persen + '%';
-
-  const fill = document.getElementById('progressFill');
-  fill.style.width  = persen + '%';
-  fill.textContent  = persen > 8 ? persen + '%' : '';
-
-  let filtered = withStatus;
-  if (currentTab === 'hadir') filtered = filtered.filter(p => p.hadir);
-  if (currentTab === 'belum') filtered = filtered.filter(p => !p.hadir);
-  if (searchTerm) {
-    filtered = filtered.filter(p =>
-      p.nama.toLowerCase().includes(searchTerm) ||
-      p.id.toLowerCase().includes(searchTerm)
-    );
-  }
-
-  const tbody = document.getElementById('tableBody');
-  tbody.innerHTML = '';
-
-  if (filtered.length === 0) {
-    document.getElementById('emptyState').classList.remove('hidden');
-  } else {
-    document.getElementById('emptyState').classList.add('hidden');
-    filtered.forEach(p => {
-      const tr = document.createElement('tr');
-      const detailUrl = `peserta.html?id=${encodeURIComponent(p.id)}&pelatihan=${encodeURIComponent(p.pelatihan)}`;
-      tr.innerHTML = `
-        <td class="td-id">${p.id}</td>
-        <td><a class="nama-link" href="${detailUrl}">${p.nama}</a></td>
-        <td>${p.pelatihan}</td>
-        <td>${p.wilayah}</td>
-        <td style="text-align:center">
-          <span class="status-icon ${p.hadir ? 'hadir' : 'belum'}">${p.hadir ? '✓' : '✗'}</span>
-        </td>
-      `;
-      tbody.appendChild(tr);
-    });
-  }
-
-  updateReportBtn();
-}
-
-loadDashboard();
+// ===== START =====
+init();
 </script>
 </body>
 </html>
