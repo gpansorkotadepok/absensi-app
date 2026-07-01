@@ -68,30 +68,26 @@
     background: #fff; border-radius: var(--radius);
     box-shadow: var(--shadow); padding: 20px 24px;
     margin-bottom: 20px; display: flex;
-    align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;
+    align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 16px;
   }
   .report-title h2 { font-size: 18px; font-weight: 700; color: var(--green); }
   .report-title p  { font-size: 13px; color: var(--gray-400); margin-top: 4px; }
 
-  .report-stats { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
-  .rstat {
-    text-align: center; padding: 8px 16px;
-    border-radius: 10px; min-width: 80px;
-  }
-  .rstat.total  { background: #eff6ff; }
-  .rstat.hadir  { background: var(--green-light); }
-  .rstat.belum  { background: #fff0f0; }
+  .report-stats { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  .rstat { text-align: center; padding: 8px 14px; border-radius: 10px; min-width: 72px; }
+  .rstat.total { background: #eff6ff; }
+  .rstat.hadir { background: var(--green-light); }
+  .rstat.belum { background: #fff0f0; }
   .rstat .rv { font-size: 22px; font-weight: 700; }
   .rstat .rl { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
-  .rstat.total  .rv { color: #2563eb; }
-  .rstat.total  .rl { color: #2563eb; }
-  .rstat.hadir  .rv { color: var(--green); }
-  .rstat.hadir  .rl { color: var(--green); }
-  .rstat.belum  .rv { color: #e74c3c; }
-  .rstat.belum  .rl { color: #e74c3c; }
+  .rstat.total .rv, .rstat.total .rl { color: #2563eb; }
+  .rstat.hadir .rv, .rstat.hadir .rl { color: var(--green); }
+  .rstat.belum .rv, .rstat.belum .rl { color: #e74c3c; }
 
   .btn-pdf {
-    padding: 12px 20px; background: linear-gradient(135deg, var(--gold), #e6a832);
+    padding: 12px 20px;
+    background: linear-gradient(135deg, var(--gold), #e6a832);
     color: #fff; border: none; border-radius: 10px;
     font-size: 14px; font-weight: 700; font-family: 'Inter', sans-serif;
     cursor: pointer; box-shadow: 0 4px 12px rgba(200,151,42,0.35);
@@ -128,7 +124,7 @@
     letter-spacing: 0.5px; color: var(--gray-400);
     border-bottom: 1px solid var(--gray-100); white-space: nowrap;
   }
-  td { padding: 11px 14px; border-bottom: 1px solid var(--gray-100); vertical-align: middle; }
+  td { padding: 9px 14px; border-bottom: 1px solid var(--gray-100); vertical-align: middle; }
   tr:last-child td { border-bottom: none; }
   tr:hover td { background: var(--gray-100); }
   .td-no { color: var(--gray-400); font-size: 12px; width: 36px; }
@@ -139,8 +135,7 @@
   }
   .status-icon.hadir { background: #d1fae5; color: #006633; }
   .status-icon.belum { background: #fee2e2; color: #c0392b; }
-  .time-info { font-size: 12px; color: var(--gray-400); }
-
+  .time-info { font-size: 12px; color: var(--gray-400); font-family: monospace; }
   .empty-state { text-align: center; padding: 40px; color: var(--gray-400); }
   .empty-state .emoji { font-size: 40px; margin-bottom: 10px; }
 </style>
@@ -172,22 +167,11 @@
       <p id="reportSub">—</p>
     </div>
     <div class="report-stats">
-      <div class="rstat total">
-        <div class="rv" id="rTotal">—</div>
-        <div class="rl">Total</div>
-      </div>
-      <div class="rstat hadir">
-        <div class="rv" id="rHadir">—</div>
-        <div class="rl">Hadir</div>
-      </div>
-      <div class="rstat belum">
-        <div class="rv" id="rBelum">—</div>
-        <div class="rl">Belum</div>
-      </div>
+      <div class="rstat total"><div class="rv" id="rTotal">—</div><div class="rl">Total</div></div>
+      <div class="rstat hadir"><div class="rv" id="rHadir">—</div><div class="rl">Hadir</div></div>
+      <div class="rstat belum"><div class="rv" id="rBelum">—</div><div class="rl">Belum</div></div>
     </div>
-    <button class="btn-pdf" onclick="downloadPDF()">
-      ⬇ Download PDF
-    </button>
+    <button class="btn-pdf" onclick="downloadPDF()">⬇ Download PDF</button>
   </div>
 
   <div class="table-card">
@@ -208,7 +192,7 @@
               <th>ID</th>
               <th>Nama</th>
               <th>Wilayah</th>
-              <th>Waktu Absen</th>
+              <th>Jam Absen</th>
               <th style="text-align:center">Status</th>
             </tr>
           </thead>
@@ -224,12 +208,13 @@
 </div>
 
 <script>
-const API_URL = 'https://script.google.com/macros/s/AKfycbyO6acFGHzzJC8kdFWvR7kMytbLRn8TNsZI0BlJIPRaMmeRBmsqPOXohXHnEzuaeYT6tw/exec';
-let reportData  = null;
-let currentTab  = 'semua';
-let currentSesi = '';
+const API_URL = 'URL_APPS_SCRIPT_KAMU';
+let reportData       = null;
+let currentTab       = 'semua';
+let currentSesi      = '';
 let currentPelatihan = '';
 
+// ===== LOAD DATA =====
 async function loadReport() {
   const params = new URLSearchParams(window.location.search);
   currentPelatihan = params.get('pelatihan') || '';
@@ -257,7 +242,6 @@ async function loadReport() {
     document.getElementById('rTotal').textContent = data.totalCount;
     document.getElementById('rHadir').textContent = data.hadirCount;
     document.getElementById('rBelum').textContent = data.totalCount - data.hadirCount;
-
     renderTable();
   } catch(e) {
     alert('Gagal terhubung ke server');
@@ -266,6 +250,7 @@ async function loadReport() {
   }
 }
 
+// ===== TAB =====
 function setTab(tab) {
   currentTab = tab;
   ['semua','hadir','belum'].forEach(t => {
@@ -275,6 +260,7 @@ function setTab(tab) {
   renderTable();
 }
 
+// ===== RENDER TABEL WEB =====
 function renderTable() {
   if (!reportData) return;
   const search = document.getElementById('searchBox').value.toLowerCase().trim();
@@ -291,116 +277,238 @@ function renderTable() {
 
   if (list.length === 0) {
     document.getElementById('emptyState').classList.remove('hidden');
-  } else {
-    document.getElementById('emptyState').classList.add('hidden');
-    list.forEach((p, i) => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td class="td-no">${i + 1}</td>
-        <td class="td-id">${p.id}</td>
-        <td><strong>${p.nama}</strong></td>
-        <td>${p.wilayah}</td>
-        <td class="time-info">${p.hadir ? p.tanggal + ' ' + p.jam : '—'}</td>
-        <td style="text-align:center">
-          <span class="status-icon ${p.hadir ? 'hadir' : 'belum'}">${p.hadir ? '✓' : '✗'}</span>
-        </td>
-      `;
-      tbody.appendChild(tr);
-    });
+    return;
   }
+
+  document.getElementById('emptyState').classList.add('hidden');
+  list.forEach((p, i) => {
+    const tr = document.createElement('tr');
+    // tampilkan jam saja, bukan tanggal
+    const jamOnly = p.hadir ? jamSaja(p.jam) : '—';
+    tr.innerHTML = `
+      <td class="td-no">${i + 1}</td>
+      <td class="td-id">${p.id}</td>
+      <td><strong>${p.nama}</strong></td>
+      <td>${p.wilayah}</td>
+      <td class="time-info">${jamOnly}</td>
+      <td style="text-align:center">
+        <span class="status-icon ${p.hadir ? 'hadir' : 'belum'}">${p.hadir ? '✓' : '✗'}</span>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
 }
 
-function downloadPDF() {
+// helper: ambil jam saja dari string "HH:mm:ss" atau objek Date
+function jamSaja(val) {
+  if (!val) return '—';
+  const str = String(val);
+  // kalau format "HH:mm:ss" langsung
+  if (/^\d{1,2}:\d{2}(:\d{2})?$/.test(str)) return str;
+  // kalau ada tanggal di depan, ambil bagian waktu saja
+  const parts = str.split(' ');
+  return parts.length > 1 ? parts[parts.length - 1] : str;
+}
+
+// ===== DOWNLOAD PDF =====
+async function downloadPDF() {
   if (!reportData) return;
+
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-
   const pageW = doc.internal.pageSize.getWidth();
+  const pageH = doc.internal.pageSize.getHeight();
+  const margin = 14;
 
-  // Header hijau
-  doc.setFillColor(0, 102, 51);
-  doc.rect(0, 0, pageW, 40, 'F');
+  // ── KOP SURAT ──────────────────────────────────────
+  // Coba load kop.jpg dari repo GitHub yang sama
+  let kopY = 10; // posisi mulai konten setelah kop
 
-  doc.setTextColor(255, 255, 255);
-  doc.setFontSize(16);
-  doc.setFont('helvetica', 'bold');
-  doc.text('DAFTAR ABSENSI', pageW / 2, 14, { align: 'center' });
+  try {
+    const kopDataUrl = await loadImageAsDataUrl('kop.jpg');
+    // Kop surat full lebar, tinggi proporsional (anggap kop 210mm x 40mm)
+    const kopH = 35; // sesuaikan tinggi kop (mm) sesuai gambar kamu
+    doc.addImage(kopDataUrl, 'PNG', 0, 0, pageW, kopH);
+    kopY = kopH + 4;
+    // garis bawah kop
+    doc.setDrawColor(0, 102, 51);
+    doc.setLineWidth(0.8);
+    doc.line(margin, kopY, pageW - margin, kopY);
+    kopY += 6;
+  } catch(e) {
+    // kalau kop.jpg tidak ditemukan, pakai header teks sederhana
+    doc.setFillColor(0, 102, 51);
+    doc.rect(0, 0, pageW, 18, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(13);
+    doc.setFont('helvetica', 'bold');
+    doc.text('GERAKAN PEMUDA ANSOR', pageW / 2, 11, { align: 'center' });
+    kopY = 22;
+  }
 
-  doc.setFontSize(12);
-  doc.setFont('helvetica', 'normal');
-  doc.text('Gerakan Pemuda Ansor', pageW / 2, 22, { align: 'center' });
-
-  doc.setFontSize(10);
-  doc.text(`Pelatihan: ${currentPelatihan}   |   Sesi: ${currentSesi}`, pageW / 2, 30, { align: 'center' });
-
-  // Ringkasan
+  // ── JUDUL DOKUMEN ───────────────────────────────────
   doc.setTextColor(0, 0, 0);
+  doc.setFontSize(12);
+  doc.setFont('helvetica', 'bold');
+  doc.text('DAFTAR HADIR PESERTA', pageW / 2, kopY, { align: 'center' });
+  kopY += 6;
+
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
-  const now = new Date();
-  const tgl = now.toLocaleDateString('id-ID', { day:'2-digit', month:'long', year:'numeric' });
-  doc.text(`Dicetak: ${tgl}`, 14, 48);
-  doc.text(
-    `Total: ${reportData.totalCount}   Hadir: ${reportData.hadirCount}   Belum: ${reportData.totalCount - reportData.hadirCount}`,
-    pageW - 14, 48, { align: 'right' }
-  );
+  doc.text(`Pelatihan : ${currentPelatihan}`, margin, kopY);
+  kopY += 5;
+  doc.text(`Sesi      : ${currentSesi}`, margin, kopY);
+  kopY += 5;
 
-  // Tabel
+  const now = new Date();
+  const tglCetak = now.toLocaleDateString('id-ID', { day:'2-digit', month:'long', year:'numeric' });
+  doc.text(`Dicetak   : ${tglCetak}`, margin, kopY);
+
+  // ringkasan kanan
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(9);
+  const ringkasanX = pageW - margin;
+  doc.setTextColor(0, 102, 51);
+  doc.text(`Total: ${reportData.totalCount}`, ringkasanX, kopY - 10, { align: 'right' });
+  doc.setTextColor(0, 102, 51);
+  doc.text(`Hadir: ${reportData.hadirCount}`, ringkasanX, kopY - 5, { align: 'right' });
+  doc.setTextColor(192, 57, 43);
+  doc.text(`Belum: ${reportData.totalCount - reportData.hadirCount}`, ringkasanX, kopY, { align: 'right' });
+  doc.setTextColor(0, 0, 0);
+
+  kopY += 6;
+
+  // ── TABEL ───────────────────────────────────────────
+  const tableData = reportData.daftar.map((p, i) => [
+    i + 1,
+    p.id,
+    p.nama,
+    p.wilayah,
+    p.hadir ? jamSaja(p.jam) : '—',
+    p.hadir ? 'Hadir' : 'Belum'
+  ]);
+
   doc.autoTable({
-    startY: 54,
-    head: [['No', 'ID Peserta', 'Nama', 'Wilayah', 'Jam Absen', 'Status']],
-    body: reportData.daftar.map((p, i) => [
-      i + 1,
-      p.id,
-      p.nama,
-      p.wilayah,
-      p.hadir ? p.tanggal + '\n' + p.jam : '—',
-      p.hadir ? 'Hadir' : 'Belum'
-    ]),
-    styles: { fontSize: 9, cellPadding: 3, font: 'helvetica' },
-    headStyles: { fillColor: [0, 102, 51], textColor: 255, fontStyle: 'bold' },
+    startY: kopY,
+    head: [['No', 'ID Peserta', 'Nama Peserta', 'Wilayah', 'Jam Absen', 'Status']],
+    body: tableData,
+    styles: {
+      fontSize: 8,
+      cellPadding: { top: 2, right: 3, bottom: 2, left: 3 }, // rapat
+      font: 'helvetica',
+      valign: 'middle',
+      overflow: 'linebreak'
+    },
+    headStyles: {
+      fillColor: [0, 102, 51],
+      textColor: 255,
+      fontStyle: 'bold',
+      fontSize: 8,
+      cellPadding: { top: 3, right: 3, bottom: 3, left: 3 }
+    },
     alternateRowStyles: { fillColor: [240, 248, 244] },
     columnStyles: {
-      0: { cellWidth: 10, halign: 'center' },
+      0: { cellWidth: 8,  halign: 'center' },
       1: { cellWidth: 30 },
-      2: { cellWidth: 50 },
-      3: { cellWidth: 35 },
-      4: { cellWidth: 28, halign: 'center' },
-      5: { cellWidth: 20, halign: 'center' }
+      2: { cellWidth: 60 },
+      3: { cellWidth: 40 },
+      4: { cellWidth: 22, halign: 'center' },
+      5: { cellWidth: 18, halign: 'center', fontStyle: 'bold' }
     },
-    didDrawCell: (data) => {
+    didParseCell(data) {
       if (data.column.index === 5 && data.section === 'body') {
-        const val = data.cell.raw;
-        if (val === 'Hadir') {
-          doc.setTextColor(0, 102, 51);
-        } else {
-          doc.setTextColor(192, 57, 43);
-        }
+        data.cell.styles.textColor = data.cell.raw === 'Hadir'
+          ? [0, 102, 51]
+          : [192, 57, 43];
       }
     },
-    didParseCell: (data) => {
-      if (data.column.index === 5 && data.section === 'body') {
-        data.cell.styles.fontStyle = 'bold';
-      }
-    }
+    margin: { left: margin, right: margin },
+    // pastikan tanda tangan tidak terputus di halaman
+    showFoot: 'lastPage'
   });
 
-  // Footer
-  const pageCount = doc.internal.getNumberOfPages();
-  for (let i = 1; i <= pageCount; i++) {
+  // ── TANDA TANGAN (halaman terakhir) ─────────────────
+  const finalY = doc.lastAutoTable.finalY;
+  const ttdY   = finalY + 14;
+
+  // cek sisa ruang — kalau tidak cukup untuk ttd, tambah halaman baru
+  const sisaRuang = pageH - ttdY - margin;
+  let startTtd = ttdY;
+  if (sisaRuang < 45) {
+    doc.addPage();
+    startTtd = margin + 10;
+  }
+
+  // garis atas ttd
+  doc.setDrawColor(180, 180, 180);
+  doc.setLineWidth(0.3);
+  doc.line(margin, startTtd - 2, pageW - margin, startTtd - 2);
+
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(0, 0, 0);
+  doc.text('LEMBAR PENGESAHAN', pageW / 2, startTtd + 4, { align: 'center' });
+
+  // 3 kolom ttd: Peserta, Panitia, Mengetahui
+  const col1 = margin;
+  const col2 = pageW / 2 - 20;
+  const col3 = pageW - margin - 40;
+  const ttdLineY = startTtd + 34;
+
+  const labels = ['Ketua Panitia', 'Sekretaris', 'Mengetahui'];
+  const xPositions = [col1, col2, col3];
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+
+  xPositions.forEach((x, idx) => {
+    // label atas
+    doc.text(labels[idx], x, startTtd + 12);
+    // ruang tanda tangan
+    doc.setDrawColor(100, 100, 100);
+    doc.setLineWidth(0.4);
+    doc.line(x, ttdLineY, x + 40, ttdLineY);
+    // nama & jabatan bawah garis
+    doc.setFont('helvetica', 'bold');
+    doc.text('(____________________)', x, ttdLineY + 5);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.text(labels[idx], x, ttdLineY + 10);
+    doc.setFontSize(9);
+  });
+
+  // ── NOMOR HALAMAN ───────────────────────────────────
+  const totalPages = doc.internal.getNumberOfPages();
+  for (let i = 1; i <= totalPages; i++) {
     doc.setPage(i);
     doc.setFontSize(8);
     doc.setTextColor(150);
     doc.text(
-      `Halaman ${i} dari ${pageCount}`,
-      pageW / 2,
-      doc.internal.pageSize.getHeight() - 8,
-      { align: 'center' }
+      `Halaman ${i} dari ${totalPages}  ·  ${currentPelatihan} — ${currentSesi}`,
+      pageW / 2, pageH - 6, { align: 'center' }
     );
   }
 
+  // ── SAVE ────────────────────────────────────────────
   const fileName = `Absensi_${currentPelatihan}_${currentSesi}.pdf`.replace(/\s+/g, '_');
   doc.save(fileName);
+}
+
+// helper: load gambar dari URL sebagai dataURL (untuk kop surat)
+function loadImageAsDataUrl(src) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width  = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+      canvas.getContext('2d').drawImage(img, 0, 0);
+      resolve(canvas.toDataURL('image/jpeg'));
+    };
+    img.onerror = reject;
+    img.src = src + '?t=' + Date.now(); // hindari cache
+  });
 }
 
 loadReport();
