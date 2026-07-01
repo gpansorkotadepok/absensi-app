@@ -3,224 +3,398 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard Absensi</title>
+<title>Dashboard Absensi GP Ansor</title>
 <style>
-  * { box-sizing: border-box; }
-  body {
-    font-family: 'Segoe UI', Arial, sans-serif;
-    background: #f4f6f9;
-    margin: 0;
-    padding: 16px;
-    color: #1f2937;
-  }
-  .topbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    max-width: 1100px;
-    margin: 0 auto 20px;
-  }
-  .topbar h1 { font-size: 20px; margin: 0; }
-  .topbar a {
-    text-decoration: none;
-    color: #2563eb;
-    font-weight: bold;
-    font-size: 14px;
-  }
-  .wrapper { max-width: 1100px; margin: 0 auto; }
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
+  :root {
+    --green:       #006633;
+    --green-dark:  #004d26;
+    --green-light: #e8f5ee;
+    --gold:        #c8972a;
+    --white:       #ffffff;
+    --gray-100:    #f5f5f5;
+    --gray-200:    #e8e8e8;
+    --gray-400:    #9e9e9e;
+    --gray-700:    #424242;
+    --radius:      16px;
+    --shadow:      0 4px 20px rgba(0,0,0,0.08);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #f0f4f0;
+    color: var(--gray-700);
+    min-height: 100vh;
+  }
+
+  /* LOADING OVERLAY */
+  #loadingOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    backdrop-filter: blur(4px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+    gap: 16px;
+  }
+  #loadingOverlay.hidden { display: none; }
+  .spinner {
+    width: 52px; height: 52px;
+    border: 4px solid rgba(255,255,255,0.2);
+    border-top: 4px solid #fff;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .spinner-text { color: #fff; font-size: 14px; font-weight: 500; }
+  .hidden { display: none !important; }
+
+  /* TOPBAR */
+  .topbar {
+    background: linear-gradient(135deg, var(--green-dark), var(--green));
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .topbar-left { display: flex; align-items: center; gap: 12px; }
+  .topbar-logo {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  .topbar-logo img { width: 100%; height: 100%; object-fit: contain; }
+  .topbar h1 { color: #fff; font-size: 16px; font-weight: 700; }
+  .topbar p  { color: rgba(255,255,255,0.7); font-size: 12px; }
+  .topbar-back {
+    background: rgba(255,255,255,0.15);
+    color: #fff;
+    text-decoration: none;
+    padding: 8px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    transition: background 0.2s;
+    white-space: nowrap;
+  }
+  .topbar-back:hover { background: rgba(255,255,255,0.25); }
+
+  /* WRAPPER */
+  .wrapper { max-width: 960px; margin: 0 auto; padding: 20px 16px; }
+
+  /* FILTERS */
   .filters {
     display: flex;
     gap: 10px;
     flex-wrap: wrap;
     margin-bottom: 20px;
   }
-  .filters select {
+  .filter-select {
     flex: 1;
-    min-width: 160px;
-    padding: 10px 12px;
-    border-radius: 8px;
-    border: 1px solid #d1d5db;
-    background: #fff;
+    min-width: 150px;
+    padding: 11px 36px 11px 14px;
+    border: 1.5px solid var(--gray-200);
+    border-radius: 10px;
     font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    color: var(--gray-700);
+    background: #fff;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    box-shadow: var(--shadow);
+    cursor: pointer;
+    outline: none;
+    transition: border 0.2s;
   }
+  .filter-select:focus { border-color: var(--green); }
 
+  .btn-refresh {
+    padding: 11px 18px;
+    border: 1.5px solid var(--green);
+    border-radius: 10px;
+    background: #fff;
+    color: var(--green);
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .btn-refresh:hover { background: var(--green-light); }
+
+  /* CARDS */
   .cards {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 14px;
-    margin-bottom: 24px;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
   }
-  .card {
+  .stat-card {
     background: #fff;
-    border-radius: 14px;
-    padding: 18px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    border-radius: var(--radius);
+    padding: 18px 16px;
+    box-shadow: var(--shadow);
+    border-left: 4px solid transparent;
+    transition: transform 0.2s;
   }
-  .card .label { font-size: 13px; color: #6b7280; margin-bottom: 6px; }
-  .card .value { font-size: 28px; font-weight: 700; }
-  .card.total .value { color: #2563eb; }
-  .card.hadir .value { color: #059669; }
-  .card.belum .value { color: #dc2626; }
-  .card.persen .value { color: #7c3aed; }
+  .stat-card:hover { transform: translateY(-2px); }
+  .stat-card.total  { border-color: #2563eb; }
+  .stat-card.hadir  { border-color: var(--green); }
+  .stat-card.belum  { border-color: #e74c3c; }
+  .stat-card.persen { border-color: var(--gold); }
 
-  .progress-section {
+  .stat-card .label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--gray-400);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+  }
+  .stat-card .value {
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 1;
+  }
+  .stat-card.total  .value { color: #2563eb; }
+  .stat-card.hadir  .value { color: var(--green); }
+  .stat-card.belum  .value { color: #e74c3c; }
+  .stat-card.persen .value { color: var(--gold); }
+
+  /* PROGRESS */
+  .progress-card {
     background: #fff;
-    border-radius: 14px;
-    padding: 18px;
-    margin-bottom: 24px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow);
   }
-  .progress-section h3 { margin: 0 0 14px; font-size: 15px; }
-  .progress-bar-bg {
+  .progress-card h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--gray-700);
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+  }
+  .progress-track {
     width: 100%;
-    height: 22px;
-    background: #e5e7eb;
-    border-radius: 11px;
+    height: 20px;
+    background: var(--gray-100);
+    border-radius: 10px;
     overflow: hidden;
-    position: relative;
   }
-  .progress-bar-fill {
+  .progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, #34d399, #059669);
-    border-radius: 11px;
-    transition: width 0.4s ease;
+    background: linear-gradient(90deg, #34d399, var(--green));
+    border-radius: 10px;
+    transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    color: #fff;
-    font-size: 12px;
-    font-weight: bold;
     padding-right: 8px;
-    white-space: nowrap;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    min-width: 0;
   }
 
-  .table-section {
+  /* TABLE CARD */
+  .table-card {
     background: #fff;
-    border-radius: 14px;
-    padding: 18px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
   }
-  .table-section h3 {
-    margin: 0 0 14px;
-    font-size: 15px;
+  .table-card-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--gray-100);
   }
+  .table-card-header h3 { font-size: 15px; font-weight: 700; margin-bottom: 12px; }
+
   .tabs {
     display: flex;
-    gap: 8px;
-    margin-bottom: 14px;
+    gap: 6px;
+    flex-wrap: wrap;
   }
   .tab-btn {
-    padding: 8px 16px;
+    padding: 7px 16px;
     border-radius: 20px;
-    border: 1px solid #d1d5db;
-    background: #fff;
+    border: 1.5px solid var(--gray-200);
+    background: var(--gray-100);
     cursor: pointer;
     font-size: 13px;
     font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    color: var(--gray-400);
+    transition: all 0.2s;
   }
-  .tab-btn.active {
-    background: #2563eb;
-    color: #fff;
-    border-color: #2563eb;
-  }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 14px;
-  }
-  th, td {
-    text-align: left;
-    padding: 10px 8px;
-    border-bottom: 1px solid #f0f0f0;
-  }
-  th { color: #6b7280; font-size: 12px; text-transform: uppercase; }
-  .badge {
-    padding: 3px 10px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: 600;
-  }
-  .badge.hadir { background: #d1fae5; color: #065f46; }
-  .badge.belum { background: #fee2e2; color: #991b1b; }
+  .tab-btn:hover { border-color: var(--green); color: var(--green); }
+  .tab-btn.active { background: var(--green); color: #fff; border-color: var(--green); }
 
-  .empty-msg {
-    text-align: center;
-    color: #9ca3af;
-    padding: 30px 0;
+  .search-bar {
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--gray-100);
   }
-  .hidden { display: none; }
-  .loading {
-    text-align: center;
-    padding: 40px;
-    color: #6b7280;
-  }
-  input#searchBox {
+  .search-bar input {
     width: 100%;
-    padding: 10px 12px;
-    border-radius: 8px;
-    border: 1px solid #d1d5db;
-    margin-bottom: 12px;
+    padding: 10px 14px;
+    border: 1.5px solid var(--gray-200);
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    outline: none;
+    transition: border 0.2s;
+    background: var(--gray-100);
+  }
+  .search-bar input:focus { border-color: var(--green); background: #fff; }
+
+  /* TABLE */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th {
+    padding: 10px 16px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--gray-400);
+    border-bottom: 1px solid var(--gray-100);
+    white-space: nowrap;
+  }
+  td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--gray-100);
+    vertical-align: middle;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--gray-100); }
+  .td-id { font-family: monospace; font-size: 12px; color: var(--gray-400); }
+
+  /* STATUS ICON */
+  .status-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     font-size: 14px;
   }
+  .status-icon.hadir { background: #d1fae5; color: #006633; }
+  .status-icon.belum { background: #fee2e2; color: #c0392b; }
+
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--gray-400);
+  }
+  .empty-state .emoji { font-size: 40px; margin-bottom: 10px; }
+  .empty-state p { font-size: 14px; }
 </style>
 </head>
 <body>
 
+<!-- LOADING -->
+<div id="loadingOverlay">
+  <div class="spinner"></div>
+  <div class="spinner-text">Memuat data...</div>
+</div>
+
+<!-- TOPBAR -->
 <div class="topbar">
-  <h1>📊 Dashboard Absensi</h1>
-  <a href="index.html">← Kembali ke Scan</a>
+  <div class="topbar-left">
+    <div class="topbar-logo">
+      <img src="https://upload.wikimedia.org/wikipedia/id/3/33/Logo_GP_Ansor.png"
+           alt="GP Ansor"
+           onerror="this.style.display='none'">
+    </div>
+    <div>
+      <h1>Dashboard Absensi</h1>
+      <p>Gerakan Pemuda Ansor</p>
+    </div>
+  </div>
+  <a href="index.html" class="topbar-back">← Scan</a>
 </div>
 
 <div class="wrapper">
 
+  <!-- FILTERS -->
   <div class="filters">
-    <select id="filterPelatihan" onchange="onFilterPelatihanChange()">
+    <select class="filter-select" id="filterPelatihan" onchange="onFilterPelatihanChange()">
       <option value="">Semua Pelatihan</option>
     </select>
-    <select id="filterSesi" onchange="render()">
+    <select class="filter-select" id="filterSesi" onchange="render()">
       <option value="">Semua Sesi</option>
     </select>
+    <button class="btn-refresh" onclick="loadDashboard()">⟳ Refresh</button>
   </div>
 
-  <div id="loadingMsg" class="loading">Memuat data...</div>
-
-  <div id="content" class="hidden">
-
-    <div class="cards">
-      <div class="card total">
-        <div class="label">Total Peserta</div>
-        <div class="value" id="cardTotal">0</div>
-      </div>
-      <div class="card hadir">
-        <div class="label">Sudah Absen</div>
-        <div class="value" id="cardHadir">0</div>
-      </div>
-      <div class="card belum">
-        <div class="label">Belum Absen</div>
-        <div class="value" id="cardBelum">0</div>
-      </div>
-      <div class="card persen">
-        <div class="label">Persentase</div>
-        <div class="value" id="cardPersen">0%</div>
-      </div>
+  <!-- STATS -->
+  <div class="cards">
+    <div class="stat-card total">
+      <div class="label">Total Peserta</div>
+      <div class="value" id="cardTotal">—</div>
     </div>
-
-    <div class="progress-section">
-      <h3>Progress Kehadiran</h3>
-      <div class="progress-bar-bg">
-        <div class="progress-bar-fill" id="progressFill" style="width:0%">0%</div>
-      </div>
+    <div class="stat-card hadir">
+      <div class="label">Sudah Absen</div>
+      <div class="value" id="cardHadir">—</div>
     </div>
+    <div class="stat-card belum">
+      <div class="label">Belum Absen</div>
+      <div class="value" id="cardBelum">—</div>
+    </div>
+    <div class="stat-card persen">
+      <div class="label">Kehadiran</div>
+      <div class="value" id="cardPersen">—</div>
+    </div>
+  </div>
 
-    <div class="table-section">
+  <!-- PROGRESS -->
+  <div class="progress-card">
+    <h3>
+      Progress Kehadiran
+      <span id="progressLabel" style="color:var(--green)">0%</span>
+    </h3>
+    <div class="progress-track">
+      <div class="progress-fill" id="progressFill" style="width:0%"></div>
+    </div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-card">
+    <div class="table-card-header">
       <h3>Daftar Peserta</h3>
       <div class="tabs">
         <button class="tab-btn active" id="tabSemua" onclick="setTab('semua')">Semua</button>
-        <button class="tab-btn" id="tabHadir" onclick="setTab('hadir')">Sudah Absen</button>
-        <button class="tab-btn" id="tabBelum" onclick="setTab('belum')">Belum Absen</button>
+        <button class="tab-btn" id="tabHadir" onclick="setTab('hadir')">✓ Hadir</button>
+        <button class="tab-btn" id="tabBelum" onclick="setTab('belum')">✗ Belum</button>
       </div>
-      <input type="text" id="searchBox" placeholder="Cari nama atau ID..." oninput="render()">
+    </div>
+    <div class="search-bar">
+      <input type="text" id="searchBox" placeholder="🔍 Cari nama atau ID peserta..." oninput="render()">
+    </div>
+    <div class="table-wrap">
       <table>
         <thead>
           <tr>
@@ -228,84 +402,76 @@
             <th>Nama</th>
             <th>Pelatihan</th>
             <th>Wilayah</th>
-            <th>Status</th>
+            <th style="text-align:center">Status</th>
           </tr>
         </thead>
         <tbody id="tableBody"></tbody>
       </table>
-      <div id="emptyMsg" class="empty-msg hidden">Tidak ada data</div>
+      <div id="emptyState" class="empty-state hidden">
+        <div class="emoji">🔍</div>
+        <p>Tidak ada data yang cocok</p>
+      </div>
     </div>
-
   </div>
+
 </div>
 
 <script>
-// =================== GANTI URL INI ===================
 const API_URL = 'https://script.google.com/macros/s/AKfycbyO6acFGHzzJC8kdFWvR7kMytbLRn8TNsZI0BlJIPRaMmeRBmsqPOXohXHnEzuaeYT6tw/exec';
-// =======================================================
 
 let dashboardData = null;
 let currentTab = 'semua';
 
 async function loadDashboard() {
+  document.getElementById('loadingOverlay').classList.remove('hidden');
   try {
     const res = await fetch(API_URL, {
       method: 'POST',
       body: JSON.stringify({ action: 'getDashboard' })
     });
     const data = await res.json();
-
-    if (!data.success) {
-      document.getElementById('loadingMsg').textContent = 'Gagal memuat data';
-      return;
-    }
-
+    if (!data.success) { alert('Gagal memuat data'); return; }
     dashboardData = data;
     populateFilters(data);
-
-    document.getElementById('loadingMsg').classList.add('hidden');
-    document.getElementById('content').classList.remove('hidden');
     render();
   } catch (e) {
-    document.getElementById('loadingMsg').textContent = 'Gagal terhubung ke server';
+    alert('Gagal terhubung ke server');
+  } finally {
+    document.getElementById('loadingOverlay').classList.add('hidden');
   }
 }
 
 function populateFilters(data) {
-  const selPelatihan = document.getElementById('filterPelatihan');
+  const sel = document.getElementById('filterPelatihan');
+  sel.innerHTML = '<option value="">Semua Pelatihan</option>';
   data.pelatihanList.forEach(p => {
     const opt = document.createElement('option');
     opt.value = p; opt.textContent = p;
-    selPelatihan.appendChild(opt);
+    sel.appendChild(opt);
   });
   updateSesiFilter('');
 }
 
 function updateSesiFilter(pelatihan) {
-  const selSesi = document.getElementById('filterSesi');
-  selSesi.innerHTML = '<option value="">Semua Sesi</option>';
-
+  const sel = document.getElementById('filterSesi');
+  sel.innerHTML = '<option value="">Semua Sesi</option>';
   let list = [];
   if (pelatihan && dashboardData.sesiByPelatihan[pelatihan]) {
     list = dashboardData.sesiByPelatihan[pelatihan];
   } else {
     const set = {};
-    Object.values(dashboardData.sesiByPelatihan).forEach(arr => {
-      arr.forEach(s => set[s] = true);
-    });
+    Object.values(dashboardData.sesiByPelatihan).forEach(arr => arr.forEach(s => set[s] = true));
     list = Object.keys(set);
   }
-
   list.forEach(s => {
     const opt = document.createElement('option');
     opt.value = s; opt.textContent = s;
-    selSesi.appendChild(opt);
+    sel.appendChild(opt);
   });
 }
 
 function onFilterPelatihanChange() {
-  const pelatihan = document.getElementById('filterPelatihan').value;
-  updateSesiFilter(pelatihan);
+  updateSesiFilter(document.getElementById('filterPelatihan').value);
   render();
 }
 
@@ -322,13 +488,11 @@ function render() {
   if (!dashboardData) return;
 
   const pelatihanFilter = document.getElementById('filterPelatihan').value;
-  const sesiFilter = document.getElementById('filterSesi').value;
-  const searchTerm = document.getElementById('searchBox').value.toLowerCase().trim();
+  const sesiFilter      = document.getElementById('filterSesi').value;
+  const searchTerm      = document.getElementById('searchBox').value.toLowerCase().trim();
 
   let peserta = dashboardData.peserta;
-  if (pelatihanFilter) {
-    peserta = peserta.filter(p => p.pelatihan === pelatihanFilter);
-  }
+  if (pelatihanFilter) peserta = peserta.filter(p => p.pelatihan === pelatihanFilter);
 
   let sesiToCheck;
   if (sesiFilter) {
@@ -342,31 +506,28 @@ function render() {
   }
 
   const withStatus = peserta.map(p => {
-    let hadir = false;
-    for (const s of sesiToCheck) {
-      if (dashboardData.absensiSet[p.id + '|' + s]) { hadir = true; break; }
-    }
-    return Object.assign({}, p, { hadir });
+    const hadir = sesiToCheck.some(s => dashboardData.absensiSet[p.id + '|' + s]);
+    return { ...p, hadir };
   });
 
-  const totalCount = withStatus.length;
-  const hadirCount = withStatus.filter(p => p.hadir).length;
-  const belumCount = totalCount - hadirCount;
-  const persen = totalCount ? Math.round((hadirCount / totalCount) * 100) : 0;
+  const total  = withStatus.length;
+  const hadir  = withStatus.filter(p => p.hadir).length;
+  const belum  = total - hadir;
+  const persen = total ? Math.round((hadir / total) * 100) : 0;
 
-  document.getElementById('cardTotal').textContent = totalCount;
-  document.getElementById('cardHadir').textContent = hadirCount;
-  document.getElementById('cardBelum').textContent = belumCount;
+  document.getElementById('cardTotal').textContent  = total;
+  document.getElementById('cardHadir').textContent  = hadir;
+  document.getElementById('cardBelum').textContent  = belum;
   document.getElementById('cardPersen').textContent = persen + '%';
+  document.getElementById('progressLabel').textContent = persen + '%';
 
   const fill = document.getElementById('progressFill');
   fill.style.width = persen + '%';
-  fill.textContent = persen + '%';
+  fill.textContent = persen > 8 ? persen + '%' : '';
 
   let filtered = withStatus;
   if (currentTab === 'hadir') filtered = filtered.filter(p => p.hadir);
   if (currentTab === 'belum') filtered = filtered.filter(p => !p.hadir);
-
   if (searchTerm) {
     filtered = filtered.filter(p =>
       p.nama.toLowerCase().includes(searchTerm) ||
@@ -378,19 +539,21 @@ function render() {
   tbody.innerHTML = '';
 
   if (filtered.length === 0) {
-    document.getElementById('emptyMsg').classList.remove('hidden');
+    document.getElementById('emptyState').classList.remove('hidden');
   } else {
-    document.getElementById('emptyMsg').classList.add('hidden');
+    document.getElementById('emptyState').classList.add('hidden');
     filtered.forEach(p => {
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td>${p.id}</td>
-        <td>${p.nama}</td>
+        <td class="td-id">${p.id}</td>
+        <td><strong>${p.nama}</strong></td>
         <td>${p.pelatihan}</td>
         <td>${p.wilayah}</td>
-        <td>${p.hadir
-          ? '<span class="badge hadir">Sudah Absen</span>'
-          : '<span class="badge belum">Belum Absen</span>'}</td>
+        <td style="text-align:center">
+          <span class="status-icon ${p.hadir ? 'hadir' : 'belum'}">
+            ${p.hadir ? '✓' : '✗'}
+          </span>
+        </td>
       `;
       tbody.appendChild(tr);
     });
@@ -399,6 +562,5 @@ function render() {
 
 loadDashboard();
 </script>
-
 </body>
 </html>
