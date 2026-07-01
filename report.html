@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Report Sesi</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+  :root {
+    --green:      #006633;
+    --green-dark: #004d26;
+    --green-light:#e8f5ee;
+    --gold:       #c8972a;
+    --gray-100:   #f5f5f5;
+    --gray-200:   #e8e8e8;
+    --gray-400:   #9e9e9e;
+    --gray-700:   #424242;
+    --radius:     16px;
+    --shadow:     0 4px 20px rgba(0,0,0,0.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', sans-serif; background: #f0f4f0; color: var(--gray-700); min-height: 100vh; }
+
+  #loadingOverlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.45);
+    backdrop-filter: blur(4px); display: flex; flex-direction: column;
+    align-items: center; justify-content: center; z-index: 999; gap: 16px;
+  }
+  #loadingOverlay.hidden { display: none; }
+  .spinner {
+    width: 52px; height: 52px;
+    border: 4px solid rgba(255,255,255,0.2);
+    border-top: 4px solid #fff; border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .spinner-text { color: #fff; font-size: 14px; font-weight: 500; }
+  .hidden { display: none !important; }
+
+  .topbar {
+    background: linear-gradient(135deg, var(--green-dark), var(--green));
+    padding: 16px 20px; display: flex; align-items: center;
+    justify-content: space-between; box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+    position: sticky; top: 0; z-index: 10;
+  }
+  .topbar-left { display: flex; align-items: center; gap: 12px; }
+  .topbar-logo {
+    width: 38px; height: 38px; border-radius: 50%; background: #fff;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden; flex-shrink: 0;
+  }
+  .topbar-logo img { width: 100%; height: 100%; object-fit: contain; }
+  .topbar h1 { color: #fff; font-size: 16px; font-weight: 700; }
+  .topbar p  { color: rgba(255,255,255,0.7); font-size: 12px; }
+  .topbar-back {
+    background: rgba(255,255,255,0.15); color: #fff;
+    text-decoration: none; padding: 8px 14px;
+    border-radius: 20px; font-size: 13px; font-weight: 600;
+    transition: background 0.2s; white-space: nowrap;
+  }
+  .topbar-back:hover { background: rgba(255,255,255,0.25); }
+
+  .wrapper { max-width: 900px; margin: 0 auto; padding: 20px 16px; }
+
+  .report-header {
+    background: #fff; border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 20px 24px;
+    margin-bottom: 20px; display: flex;
+    align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;
+  }
+  .report-title h2 { font-size: 18px; font-weight: 700; color: var(--green); }
+  .report-title p  { font-size: 13px; color: var(--gray-400); margin-top: 4px; }
+
+  .report-stats { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+  .rstat {
+    text-align: center; padding: 8px 16px;
+    border-radius: 10px; min-width: 80px;
+  }
+  .rstat.total  { background: #eff6ff; }
+  .rstat.hadir  { background: var(--green-light); }
+  .rstat.belum  { background: #fff0f0; }
+  .rstat .rv { font-size: 22px; font-weight: 700; }
+  .rstat .rl { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+  .rstat.total  .rv { color: #2563eb; }
+  .rstat.total  .rl { color: #2563eb; }
+  .rstat.hadir  .rv { color: var(--green); }
+  .rstat.hadir  .rl { color: var(--green); }
+  .rstat.belum  .rv { color: #e74c3c; }
+  .rstat.belum  .rl { color: #e74c3c; }
+
+  .btn-pdf {
+    padding: 12px 20px; background: linear-gradient(135deg, var(--gold), #e6a832);
+    color: #fff; border: none; border-radius: 10px;
+    font-size: 14px; font-weight: 700; font-family: 'Inter', sans-serif;
+    cursor: pointer; box-shadow: 0 4px 12px rgba(200,151,42,0.35);
+    transition: all 0.2s; display: flex; align-items: center; gap: 8px;
+  }
+  .btn-pdf:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(200,151,42,0.45); }
+
+  .tabs { display: flex; gap: 6px; margin-bottom: 14px; }
+  .tab-btn {
+    padding: 7px 16px; border-radius: 20px;
+    border: 1.5px solid var(--gray-200); background: var(--gray-100);
+    cursor: pointer; font-size: 13px; font-weight: 600;
+    font-family: 'Inter', sans-serif; color: var(--gray-400); transition: all 0.2s;
+  }
+  .tab-btn:hover { border-color: var(--green); color: var(--green); }
+  .tab-btn.active { background: var(--green); color: #fff; border-color: var(--green); }
+
+  .search-bar { margin-bottom: 12px; }
+  .search-bar input {
+    width: 100%; padding: 10px 14px;
+    border: 1.5px solid var(--gray-200); border-radius: 10px;
+    font-size: 14px; font-family: 'Inter', sans-serif;
+    outline: none; transition: border 0.2s; background: var(--gray-100);
+  }
+  .search-bar input:focus { border-color: var(--green); background: #fff; }
+
+  .table-card { background: #fff; border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+  .table-card-body { padding: 16px 20px; }
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th {
+    padding: 10px 14px; text-align: left;
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.5px; color: var(--gray-400);
+    border-bottom: 1px solid var(--gray-100); white-space: nowrap;
+  }
+  td { padding: 11px 14px; border-bottom: 1px solid var(--gray-100); vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--gray-100); }
+  .td-no { color: var(--gray-400); font-size: 12px; width: 36px; }
+  .td-id { font-family: monospace; font-size: 12px; color: var(--gray-400); }
+  .status-icon {
+    width: 28px; height: 28px; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center; font-size: 14px;
+  }
+  .status-icon.hadir { background: #d1fae5; color: #006633; }
+  .status-icon.belum { background: #fee2e2; color: #c0392b; }
+  .time-info { font-size: 12px; color: var(--gray-400); }
+
+  .empty-state { text-align: center; padding: 40px; color: var(--gray-400); }
+  .empty-state .emoji { font-size: 40px; margin-bottom: 10px; }
+</style>
+</head>
+<body>
+
+<div id="loadingOverlay">
+  <div class="spinner"></div>
+  <div class="spinner-text">Memuat data report...</div>
+</div>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="topbar-logo">
+      <img src="logo.png" alt="GP Ansor" onerror="this.style.display='none'">
+    </div>
+    <div>
+      <h1 id="topbarTitle">Report Sesi</h1>
+      <p>Gerakan Pemuda Ansor</p>
+    </div>
+  </div>
+  <a href="dashboard.html" class="topbar-back">← Dashboard</a>
+</div>
+
+<div class="wrapper">
+  <div class="report-header">
+    <div class="report-title">
+      <h2 id="reportTitle">—</h2>
+      <p id="reportSub">—</p>
+    </div>
+    <div class="report-stats">
+      <div class="rstat total">
+        <div class="rv" id="rTotal">—</div>
+        <div class="rl">Total</div>
+      </div>
+      <div class="rstat hadir">
+        <div class="rv" id="rHadir">—</div>
+        <div class="rl">Hadir</div>
+      </div>
+      <div class="rstat belum">
+        <div class="rv" id="rBelum">—</div>
+        <div class="rl">Belum</div>
+      </div>
+    </div>
+    <button class="btn-pdf" onclick="downloadPDF()">
+      ⬇ Download PDF
+    </button>
+  </div>
+
+  <div class="table-card">
+    <div class="table-card-body">
+      <div class="tabs">
+        <button class="tab-btn active" id="tabSemua" onclick="setTab('semua')">Semua</button>
+        <button class="tab-btn" id="tabHadir" onclick="setTab('hadir')">✓ Hadir</button>
+        <button class="tab-btn" id="tabBelum" onclick="setTab('belum')">✗ Belum</button>
+      </div>
+      <div class="search-bar">
+        <input type="text" id="searchBox" placeholder="🔍 Cari nama atau ID..." oninput="renderTable()">
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th class="td-no">No</th>
+              <th>ID</th>
+              <th>Nama</th>
+              <th>Wilayah</th>
+              <th>Waktu Absen</th>
+              <th style="text-align:center">Status</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+        <div id="emptyState" class="empty-state hidden">
+          <div class="emoji">🔍</div>
+          <p>Tidak ada data</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const API_URL = 'https://script.google.com/macros/s/AKfycbyO6acFGHzzJC8kdFWvR7kMytbLRn8TNsZI0BlJIPRaMmeRBmsqPOXohXHnEzuaeYT6tw/exec';
+let reportData  = null;
+let currentTab  = 'semua';
+let currentSesi = '';
+let currentPelatihan = '';
+
+async function loadReport() {
+  const params = new URLSearchParams(window.location.search);
+  currentPelatihan = params.get('pelatihan') || '';
+  currentSesi      = params.get('sesi') || '';
+
+  if (!currentPelatihan || !currentSesi) {
+    alert('Parameter tidak lengkap');
+    window.location.href = 'dashboard.html';
+    return;
+  }
+
+  document.getElementById('topbarTitle').textContent = currentSesi;
+  document.getElementById('reportTitle').textContent = currentSesi;
+  document.getElementById('reportSub').textContent   = 'Pelatihan ' + currentPelatihan;
+
+  try {
+    const res  = await fetch(API_URL, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'getSesiReport', pelatihan: currentPelatihan, sesi: currentSesi })
+    });
+    const data = await res.json();
+    if (!data.success) { alert('Gagal memuat data'); return; }
+    reportData = data;
+
+    document.getElementById('rTotal').textContent = data.totalCount;
+    document.getElementById('rHadir').textContent = data.hadirCount;
+    document.getElementById('rBelum').textContent = data.totalCount - data.hadirCount;
+
+    renderTable();
+  } catch(e) {
+    alert('Gagal terhubung ke server');
+  } finally {
+    document.getElementById('loadingOverlay').classList.add('hidden');
+  }
+}
+
+function setTab(tab) {
+  currentTab = tab;
+  ['semua','hadir','belum'].forEach(t => {
+    document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1))
+      .classList.toggle('active', t === tab);
+  });
+  renderTable();
+}
+
+function renderTable() {
+  if (!reportData) return;
+  const search = document.getElementById('searchBox').value.toLowerCase().trim();
+
+  let list = reportData.daftar;
+  if (currentTab === 'hadir') list = list.filter(p => p.hadir);
+  if (currentTab === 'belum') list = list.filter(p => !p.hadir);
+  if (search) list = list.filter(p =>
+    p.nama.toLowerCase().includes(search) || p.id.toLowerCase().includes(search)
+  );
+
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = '';
+
+  if (list.length === 0) {
+    document.getElementById('emptyState').classList.remove('hidden');
+  } else {
+    document.getElementById('emptyState').classList.add('hidden');
+    list.forEach((p, i) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td class="td-no">${i + 1}</td>
+        <td class="td-id">${p.id}</td>
+        <td><strong>${p.nama}</strong></td>
+        <td>${p.wilayah}</td>
+        <td class="time-info">${p.hadir ? p.tanggal + ' ' + p.jam : '—'}</td>
+        <td style="text-align:center">
+          <span class="status-icon ${p.hadir ? 'hadir' : 'belum'}">${p.hadir ? '✓' : '✗'}</span>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+}
+
+function downloadPDF() {
+  if (!reportData) return;
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+  const pageW = doc.internal.pageSize.getWidth();
+
+  // Header hijau
+  doc.setFillColor(0, 102, 51);
+  doc.rect(0, 0, pageW, 40, 'F');
+
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(16);
+  doc.setFont('helvetica', 'bold');
+  doc.text('DAFTAR ABSENSI', pageW / 2, 14, { align: 'center' });
+
+  doc.setFontSize(12);
+  doc.setFont('helvetica', 'normal');
+  doc.text('Gerakan Pemuda Ansor', pageW / 2, 22, { align: 'center' });
+
+  doc.setFontSize(10);
+  doc.text(`Pelatihan: ${currentPelatihan}   |   Sesi: ${currentSesi}`, pageW / 2, 30, { align: 'center' });
+
+  // Ringkasan
+  doc.setTextColor(0, 0, 0);
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'normal');
+  const now = new Date();
+  const tgl = now.toLocaleDateString('id-ID', { day:'2-digit', month:'long', year:'numeric' });
+  doc.text(`Dicetak: ${tgl}`, 14, 48);
+  doc.text(
+    `Total: ${reportData.totalCount}   Hadir: ${reportData.hadirCount}   Belum: ${reportData.totalCount - reportData.hadirCount}`,
+    pageW - 14, 48, { align: 'right' }
+  );
+
+  // Tabel
+  doc.autoTable({
+    startY: 54,
+    head: [['No', 'ID Peserta', 'Nama', 'Wilayah', 'Jam Absen', 'Status']],
+    body: reportData.daftar.map((p, i) => [
+      i + 1,
+      p.id,
+      p.nama,
+      p.wilayah,
+      p.hadir ? p.tanggal + '\n' + p.jam : '—',
+      p.hadir ? 'Hadir' : 'Belum'
+    ]),
+    styles: { fontSize: 9, cellPadding: 3, font: 'helvetica' },
+    headStyles: { fillColor: [0, 102, 51], textColor: 255, fontStyle: 'bold' },
+    alternateRowStyles: { fillColor: [240, 248, 244] },
+    columnStyles: {
+      0: { cellWidth: 10, halign: 'center' },
+      1: { cellWidth: 30 },
+      2: { cellWidth: 50 },
+      3: { cellWidth: 35 },
+      4: { cellWidth: 28, halign: 'center' },
+      5: { cellWidth: 20, halign: 'center' }
+    },
+    didDrawCell: (data) => {
+      if (data.column.index === 5 && data.section === 'body') {
+        const val = data.cell.raw;
+        if (val === 'Hadir') {
+          doc.setTextColor(0, 102, 51);
+        } else {
+          doc.setTextColor(192, 57, 43);
+        }
+      }
+    },
+    didParseCell: (data) => {
+      if (data.column.index === 5 && data.section === 'body') {
+        data.cell.styles.fontStyle = 'bold';
+      }
+    }
+  });
+
+  // Footer
+  const pageCount = doc.internal.getNumberOfPages();
+  for (let i = 1; i <= pageCount; i++) {
+    doc.setPage(i);
+    doc.setFontSize(8);
+    doc.setTextColor(150);
+    doc.text(
+      `Halaman ${i} dari ${pageCount}`,
+      pageW / 2,
+      doc.internal.pageSize.getHeight() - 8,
+      { align: 'center' }
+    );
+  }
+
+  const fileName = `Absensi_${currentPelatihan}_${currentSesi}.pdf`.replace(/\s+/g, '_');
+  doc.save(fileName);
+}
+
+loadReport();
+</script>
+</body>
+</html>
