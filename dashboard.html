@@ -415,7 +415,7 @@ async function loadKelengkapan(pelatihan) {
     body: JSON.stringify({ action: 'getKelengkapan', pelatihan })
   });
   const data = await res.json();
-  if (!data.success) { alert('Gagal memuat kelengkapan'); return; }
+  if (!data.success) { alert('Gagal memuat kelengkapan: ' + (data.message || '')); return; }
   kelengkapanData = data.list;
   currentMode = 'kelengkapan';
   renderKelengkapanUI();
@@ -480,6 +480,7 @@ function renderKelengkapanTable() {
       <th style="text-align:center">KTP</th>
       <th style="text-align:center">Sertif.</th>
       <th style="text-align:center">Foto</th>
+      <th style="text-align:center">Rekom</th>
       <th style="text-align:center">Surat</th>
     </tr>
   `;
@@ -506,6 +507,7 @@ function renderKelengkapanTable() {
       <td style="text-align:center">${ck(p.ktp)}</td>
       <td style="text-align:center">${ck(p.sertifikat)}</td>
       <td style="text-align:center">${ck(p.pasFoto)}</td>
+      <td style="text-align:center">${ck(p.rekom)}</td>
       <td style="text-align:center">${ck(p.suratSehat)}</td>
     `;
     tbody.appendChild(tr);
