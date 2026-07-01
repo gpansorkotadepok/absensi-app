@@ -150,7 +150,7 @@
 <div class="topbar">
   <div class="topbar-left">
     <div class="topbar-logo">
-      <img src="logo.png" alt="GP Ansor" onerror="this.style.display='none'">
+      <img src="logo.jpg" alt="GP Ansor" onerror="this.style.display='none'">
     </div>
     <div>
       <h1 id="topbarTitle">Report Sesi</h1>
@@ -321,11 +321,11 @@ async function downloadPDF() {
   const margin = 14;
 
   // ── KOP SURAT ──────────────────────────────────────
-  // Coba load kop.png dari repo GitHub yang sama
+  // Coba load kop.jpg dari repo GitHub yang sama
   let kopY = 10; // posisi mulai konten setelah kop
 
   try {
-    const kopDataUrl = await loadImageAsDataUrl('kop.png');
+    const kopDataUrl = await loadImageAsDataUrl('kop.jpg');
     // Kop surat full lebar, tinggi proporsional (anggap kop 210mm x 40mm)
     const kopH = 35; // sesuaikan tinggi kop (mm) sesuai gambar kamu
     doc.addImage(kopDataUrl, 'PNG', 0, 0, pageW, kopH);
@@ -336,7 +336,7 @@ async function downloadPDF() {
     doc.line(margin, kopY, pageW - margin, kopY);
     kopY += 6;
   } catch(e) {
-    // kalau kop.png tidak ditemukan, pakai header teks sederhana
+    // kalau kop.jpg tidak ditemukan, pakai header teks sederhana
     doc.setFillColor(0, 102, 51);
     doc.rect(0, 0, pageW, 18, 'F');
     doc.setTextColor(255, 255, 255);
@@ -504,7 +504,7 @@ function loadImageAsDataUrl(src) {
       canvas.width  = img.naturalWidth;
       canvas.height = img.naturalHeight;
       canvas.getContext('2d').drawImage(img, 0, 0);
-      resolve(canvas.toDataURL('image/png'));
+      resolve(canvas.toDataURL('image/jpeg'));
     };
     img.onerror = reject;
     img.src = src + '?t=' + Date.now(); // hindari cache
