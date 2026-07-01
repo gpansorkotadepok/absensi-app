@@ -408,7 +408,7 @@ async function downloadPDF() {
     },
     alternateRowStyles: { fillColor: [240, 248, 244] },
     columnStyles: {
-      0: { cellWidth: 8,  halign: 'center' },
+      0: { cellWidth: 12,  halign: 'center' },
       1: { cellWidth: 30 },
       2: { cellWidth: 60 },
       3: { cellWidth: 40 },
@@ -455,7 +455,7 @@ async function downloadPDF() {
   const col3 = pageW - margin - 40;
   const ttdLineY = startTtd + 34;
 
-  const labels = ['Ketua Panitia', 'Sekretaris', 'Mengetahui'];
+  const labels = ['__________, '__________', '__________'];
   const xPositions = [col1, col2, col3];
 
   doc.setFont('helvetica', 'normal');
