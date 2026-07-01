@@ -299,15 +299,16 @@ function renderTable() {
   });
 }
 
-// helper: ambil jam saja dari string "HH:mm:ss" atau objek Date
+// helper: ambil jam saja dari berbagai kemungkinan format
+// menangani: "1899-12-30T08:14:00.000Z" (dari Google Sheets), "HH:mm:ss", atau "tanggal HH:mm:ss"
 function jamSaja(val) {
   if (!val) return '—';
   const str = String(val);
 
   // kalau format ISO dengan "T", contoh: 1899-12-30T08:14:00.000Z
   if (str.includes('T')) {
-    const timePart = str.split('T')[1]; // ambil bagian setelah T -> "08:14:00.000Z"
-    return timePart.replace('Z', '').split('.')[0]; // buang .000 dan Z -> "08:14:00"
+    const timePart = str.split('T')[1];           // "08:14:00.000Z"
+    return timePart.replace('Z', '').split('.')[0]; // "08:14:00"
   }
 
   // kalau format "HH:mm:ss" langsung
@@ -416,13 +417,14 @@ async function downloadPDF() {
     },
     alternateRowStyles: { fillColor: [240, 248, 244] },
     columnStyles: {
-    0: { cellWidth: 14, halign: 'center', cellPadding: { top: 2, right: 1, bottom: 2, left: 1 } },
-    1: { cellWidth: 28 },
-    2: { cellWidth: 60 },
-    3: { cellWidth: 40 },
-    4: { cellWidth: 22, halign: 'center' },
-    5: { cellWidth: 18, halign: 'center', fontStyle: 'bold' }
-},  
+      // kolom "No" dilebarkan sedikit & padding kiri-kanan dikecilkan
+      // supaya angka 2-digit (10, 11, ...) tidak ter-wrap jadi 2 baris
+      0: { cellWidth: 14, halign: 'center', cellPadding: { top: 2, right: 1, bottom: 2, left: 1 } },
+      1: { cellWidth: 28 },
+      2: { cellWidth: 60 },
+      3: { cellWidth: 40 },
+      4: { cellWidth: 22, halign: 'center' },
+      5: { cellWidth: 18, halign: 'center', fontStyle: 'bold' }
     },
     didParseCell(data) {
       if (data.column.index === 5 && data.section === 'body') {
@@ -458,26 +460,26 @@ async function downloadPDF() {
   doc.setTextColor(0, 0, 0);
   doc.text('LEMBAR PENGESAHAN', pageW / 2, startTtd + 4, { align: 'center' });
 
-  // 3 kolom ttd: Peserta, Panitia, Mengetahui
+  // 3 kolom ttd — label dikosongkan (blank), tinggal ditulis tangan / manual
   const col1 = margin;
   const col2 = pageW / 2 - 20;
   const col3 = pageW - margin - 40;
   const ttdLineY = startTtd + 34;
 
-  const labels = ['Ketua Panitia', 'Sekretaris', 'Mengetahui'];
+  const labels = ['', '', ''];
   const xPositions = [col1, col2, col3];
 
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(9);
 
   xPositions.forEach((x, idx) => {
-    // label atas
+    // label atas (kosong)
     doc.text(labels[idx], x, startTtd + 12);
     // ruang tanda tangan
     doc.setDrawColor(100, 100, 100);
     doc.setLineWidth(0.4);
     doc.line(x, ttdLineY, x + 40, ttdLineY);
-    // nama & jabatan bawah garis
+    // nama & jabatan bawah garis (kosong)
     doc.setFont('helvetica', 'bold');
     doc.text('(____________________)', x, ttdLineY + 5);
     doc.setFont('helvetica', 'normal');
